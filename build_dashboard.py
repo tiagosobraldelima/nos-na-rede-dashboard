@@ -643,6 +643,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
         </section>
 
+        <!-- Turma Panorama -->
+        <section>
+            <div class="glass-card rounded-3xl p-6 shadow-xl shadow-slate-100/50 dark:shadow-none transition-all flex flex-col justify-between min-h-[430px] border-t-4 border-t-brand-blue">
+                <div class="flex items-center gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <i class="fa-solid fa-users-rectangle text-brand-blue"></i>
+                    <h3 class="text-base font-outfit font-bold">Panorama por Turma</h3>
+                </div>
+                <div class="relative flex-grow flex items-center justify-center">
+                    <canvas id="chartTurma" class="max-h-[330px] w-full"></canvas>
+                </div>
+            </div>
+        </section>
+
         <!-- Charts Grid Layout -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="glass-card rounded-3xl p-6 shadow-xl shadow-slate-100/50 dark:shadow-none transition-all flex flex-col justify-between min-h-[380px] border-t-4 border-t-brand-coral">
@@ -808,6 +821,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         let chartEscolaridadeInstance = null;
         let chartVinculoInstance = null;
         let chartGeneroInstance = null;
+        let chartTurmaInstance = null;
 
         // Dark Mode — com proteção para iframes com localStorage bloqueado
         const themeToggleBtn = document.getElementById('themeToggle');
@@ -1364,8 +1378,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 vinculos: ['rgba(47,128,193,.88)','rgba(120,189,67,.88)','rgba(242,207,67,.92)','rgba(233,75,60,.88)','rgba(237,79,154,.88)'],
                 vinculosBorders: ['#2F80C1','#78BD43','#F2CF43','#E94B3C','#ED4F9A'],
                 genders: ['rgba(237,79,154,.88)','rgba(47,128,193,.88)','rgba(95,100,109,.70)','rgba(242,207,67,.92)'],
-                gendersBorders: ['#ED4F9A','#2F80C1','#5F646D','#F2CF43']
+                gendersBorders: ['#ED4F9A','#2F80C1','#5F646D','#F2CF43'],
+                turmas: ['rgba(47,128,193,.88)','rgba(51,166,217,.88)','rgba(120,189,67,.88)','rgba(242,207,67,.92)','rgba(233,75,60,.88)','rgba(237,79,154,.88)','rgba(95,100,109,.74)'],
+                turmasBorders: ['#2F80C1','#33A6D9','#78BD43','#F2CF43','#E94B3C','#ED4F9A','#5F646D']
             };
+        }
+
+        function repeatPalette(colors, size) {
+            return Array.from({ length: size }, (_, index) => colors[index % colors.length]);
         }
 
         // Atualiza / cria gráficos Chart.js
@@ -1376,6 +1396,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             try {
                 const c = getChartColors();
+
+                // --- TURMAS ---
+                const turmaCounts = {};
+                filteredRecords.forEach(r => { turmaCounts[r.turma] = (turmaCounts[r.turma] || 0) + 1; });
+                const sortedTurmas = Object.entries(turmaCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'pt-BR'));
+                const turmaLabels = sortedTurmas.map(x => capitalizePortuguese(x[0]));
+                const turmaData = sortedTurmas.map(x => x[1]);
+                const turmaBackgrounds = repeatPalette(c.turmas, turmaData.length);
+                const turmaBorders = repeatPalette(c.turmasBorders, turmaData.length);
+                if (chartTurmaInstance) {
+                    chartTurmaInstance.data.labels = turmaLabels;
+                    chartTurmaInstance.data.datasets[0].data = turmaData;
+                    chartTurmaInstance.data.datasets[0].backgroundColor = turmaBackgrounds;
+                    chartTurmaInstance.data.datasets[0].borderColor = turmaBorders;
+                    chartTurmaInstance.options.scales.x.grid.color = c.grid;
+                    chartTurmaInstance.options.scales.y.grid.display = false;
+                    chartTurmaInstance.options.scales.x.ticks.color = c.text;
+                    chartTurmaInstance.options.scales.y.ticks.color = c.text;
+                    chartTurmaInstance.update();
+                } else {
+                    chartTurmaInstance = new Chart(document.getElementById('chartTurma').getContext('2d'), {
+                        type: 'bar',
+                        data: { labels: turmaLabels, datasets: [{ label: 'Indicações', data: turmaData, backgroundColor: turmaBackgrounds, borderColor: turmaBorders, borderWidth: 1.5, borderRadius: 8 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { padding: 12, borderRadius: 12 } }, scales: { x: { beginAtZero: true, grid: { color: c.grid }, ticks: { color: c.text, precision: 0 } }, y: { grid: { display: false }, ticks: { color: c.text, font: { family: 'Inter', size: 10 } } } } }
+                    });
+                }
 
                 // --- RAÇA / ETNIA ---
                 const racaCounts = {};

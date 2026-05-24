@@ -428,7 +428,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                 <div class="space-y-1.5">
                     <label for="filterRegiao" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Região de Saúde</label>
                     <select id="filterRegiao" multiple size="4" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal transition-all multi-filter-select">
@@ -438,6 +438,12 @@
                 <div class="space-y-1.5">
                     <label for="filterMunicipio" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Município</label>
                     <select id="filterMunicipio" multiple size="4" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal transition-all multi-filter-select">
+                        <option value="ALL" selected>Selecionar todas as opções</option>
+                    </select>
+                </div>
+                <div class="space-y-1.5">
+                    <label for="filterTurma" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Turma</label>
+                    <select id="filterTurma" multiple size="4" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal transition-all multi-filter-select">
                         <option value="ALL" selected>Selecionar todas as opções</option>
                     </select>
                 </div>
@@ -6963,12 +6969,12 @@
         const FILTER_CONFIG = {
             filterGender: 'gender', filterRaca: 'raca', filterEscolaridade: 'escolaridade',
             filterVinculo: 'vinculo', filterPcd: 'pcd', filterRegiao: 'regiao',
-            filterMunicipio: 'municipio', filterStatus: 'status'
+            filterMunicipio: 'municipio', filterTurma: 'turma', filterStatus: 'status'
         };
 
         let filters = {
             gender: [], raca: [], escolaridade: [], vinculo: [], pcd: [], regiao: [],
-            municipio: [], status: [], search: ''
+            municipio: [], turma: [], status: [], search: ''
         };
 
         let currentPage = 1;
@@ -7100,6 +7106,7 @@
                 pcd: new Set(['SIM', 'NÃO']),
                 regiao: new Set(RAW_DATA.map(r => r.regiao)),
                 municipio: new Set(RAW_DATA.map(r => r.municipio)),
+                turma: new Set(RAW_DATA.map(r => r.turma)),
                 status: new Set([...RAW_DATA.map(r => r.status), 'INSCRITO', 'EDIÇÃO LIBERADA', 'DESISTENTE', 'CADASTRO RESERVA', 'INDEFERIDO'])
             };
             Object.keys(allowed).forEach(key => {
@@ -7144,7 +7151,7 @@
         // Popula selects de filtro
         function populateFilterOptions() {
             const genres = new Set(), racas = new Set(), levels = new Set(),
-                  vinculos = new Set(), regions = new Set(), cities = new Set();
+                  vinculos = new Set(), regions = new Set(), cities = new Set(), turmas = new Set();
             RAW_DATA.forEach(r => {
                 if (r.genero) genres.add(r.genero);
                 if (r.raca) racas.add(r.raca);
@@ -7152,6 +7159,7 @@
                 if (r.vinculo) vinculos.add(r.vinculo);
                 if (r.regiao) regions.add(r.regiao);
                 if (r.municipio) cities.add(r.municipio);
+                if (r.turma) turmas.add(r.turma);
             });
             populateSelect('filterGender', [...genres].sort());
             populateSelect('filterRaca', [...racas].sort());
@@ -7159,6 +7167,7 @@
             populateSelect('filterVinculo', [...vinculos].sort());
             populateSelect('filterRegiao', [...regions].sort());
             populateSelect('filterMunicipio', [...cities].sort());
+            populateSelect('filterTurma', [...turmas].sort());
         }
 
         function populateSelect(id, opts) {
@@ -7345,6 +7354,7 @@
                 const mP = matchesAnyFilter(filters.pcd, r.pcd);
                 const mReg = matchesAnyFilter(filters.regiao, r.regiao);
                 const mM = matchesAnyFilter(filters.municipio, r.municipio);
+                const mT = matchesAnyFilter(filters.turma, r.turma);
                 const mS = matchesAnyFilter(filters.status, r.status);
                 let mSrch = true;
                 if (filters.search.trim()) {
@@ -7354,7 +7364,7 @@
                             r.municipio.toLowerCase().includes(s) ||
                             (r.nome_social && r.nome_social.toLowerCase().includes(s));
                 }
-                return mG && mR && mE && mV && mP && mReg && mM && mS && mSrch;
+                return mG && mR && mE && mV && mP && mReg && mM && mT && mS && mSrch;
             });
             currentPage = 1;
             updateActiveFilterStyles();
@@ -7647,7 +7657,7 @@
             document.getElementById('tableSearch').addEventListener('input', e => { filters.search = e.target.value; filterDataset(); });
 
             document.getElementById('clearFilters').addEventListener('click', () => {
-                filters = { gender:[], raca:[], escolaridade:[], vinculo:[], pcd:[], regiao:[], municipio:[], status:[], search:'' };
+                filters = { gender:[], raca:[], escolaridade:[], vinculo:[], pcd:[], regiao:[], municipio:[], turma:[], status:[], search:'' };
                 Object.keys(FILTER_CONFIG).forEach(id => setSelectedValues(id, []));
                 document.getElementById('tableSearch').value = '';
                 filterDataset();

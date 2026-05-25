@@ -892,6 +892,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <thead>
                         <tr class="bg-slate-50 dark:bg-slate-950/40 text-slate-500 border-b border-slate-100 dark:border-slate-900">
                             <th class="p-3.5 font-bold uppercase tracking-wider">Nº</th>
+                            <th class="p-3.5 font-bold uppercase tracking-wider">Inscrição</th>
                             <th class="p-3.5 font-bold uppercase tracking-wider">Nome Completo</th>
                             <th class="p-3.5 font-bold uppercase tracking-wider">Município</th>
                             <th class="p-3.5 font-bold uppercase tracking-wider">Região de Saúde</th>
@@ -1056,6 +1057,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             return {
                 id: idx + 1,
+                inscricao: row['NÚM. INSCRIÇÃO'] || row['N'] || idx + 1,
                 nome: capitalizePortuguese(row['NOME COMPLETO'] || ''),
                 nome_social: '',
                 status: normalizeUpper(row['STATUS DA INSCRIÇÃO'], 'INSCRITO'),
@@ -1381,7 +1383,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             tableBody.innerHTML = '';
             const total = filteredRecords.length;
             if (total === 0) {
-                tableBody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium">
+                tableBody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium">
                     <i class="fa-solid fa-circle-exclamation text-2xl mb-2 block text-brand-coral"></i>
                     Nenhum registro encontrado com os filtros ativos.</td></tr>`;
                 document.getElementById('tablePaginationInfo').textContent = 'Mostrando 0 registros';
@@ -1410,6 +1412,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     : `<div>${r.nome}</div>`;
                 tr.innerHTML = `
                     <td class="p-3.5 text-slate-400 font-bold">${startIndex + idx + 1}</td>
+                    <td class="p-3.5 font-bold text-brand-blue">${r.inscricao || r.id}</td>
                     <td class="p-3.5 font-semibold text-slate-900 dark:text-white">${displayNome}</td>
                     <td class="p-3.5 font-medium">${r.municipio}</td>
                     <td class="p-3.5 text-slate-500">${r.regiao}</td>
@@ -1489,6 +1492,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         const EXPORT_COLUMNS = [
             ['id', 'ID'],
+            ['inscricao', 'Numero de Inscricao'],
             ['nome', 'Nome Completo'],
             ['nome_social', 'Nome Social'],
             ['status', 'Status'],
@@ -1506,7 +1510,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function getExportRows() {
             return filteredRecords.map(record => Object.fromEntries(
-                EXPORT_COLUMNS.map(([key, label]) => [label, record[key] || ''])
+                EXPORT_COLUMNS.map(([key, label]) => [label, key === 'inscricao' ? (record.inscricao || record.id || '') : (record[key] || '')])
             ));
         }
 
@@ -1526,7 +1530,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             if (filteredRecords.length === 0) return;
             const header = EXPORT_COLUMNS.map(([, label]) => label).join(';');
             const rows = filteredRecords.map(record => EXPORT_COLUMNS.map(([key]) => {
-                const value = String(record[key] || '').replace(/"/g, '""');
+                const rawValue = key === 'inscricao' ? (record.inscricao || record.id || '') : (record[key] || '');
+                const value = String(rawValue).replace(/"/g, '""');
                 return `"${value}"`;
             }).join(';'));
             downloadBlob('\\ufeff' + [header, ...rows].join('\\r\\n'), 'text/csv;charset=utf-8;', 'indicacoes_filtradas_nos_na_rede.csv');
@@ -1557,7 +1562,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             doc.text(`Registros filtrados: ${filteredRecords.length}`, 40, 54);
             doc.autoTable({
                 head: [EXPORT_COLUMNS.map(([, label]) => label)],
-                body: filteredRecords.map(record => EXPORT_COLUMNS.map(([key]) => record[key] || '')),
+                body: filteredRecords.map(record => EXPORT_COLUMNS.map(([key]) => key === 'inscricao' ? (record.inscricao || record.id || '') : (record[key] || ''))),
                 startY: 70,
                 styles: { fontSize: 6, cellPadding: 3, overflow: 'linebreak' },
                 headStyles: { fillColor: [47, 128, 193], textColor: 255 },

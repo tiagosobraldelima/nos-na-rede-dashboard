@@ -242,54 +242,86 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
         .collage-banner-wrapper {
             position: fixed;
-            inset: 0;
+            inset: -5vh -4vw;
+            min-height: 110vh;
             pointer-events: none;
             overflow: hidden;
             z-index: 0;
-            opacity: .34;
+            opacity: .48;
         }
         .collage-banner-wrapper::after {
             content: "";
             position: absolute;
             inset: 0;
+            z-index: 40;
             background:
-                linear-gradient(180deg, rgba(242,244,247,.78), rgba(242,244,247,.92) 42%, rgba(242,244,247,.98)),
-                radial-gradient(circle at 50% 15%, rgba(255,255,255,.35), transparent 46%);
+                linear-gradient(180deg, rgba(234,234,234,.68), rgba(234,234,234,.9) 48%, rgba(234,234,234,.97)),
+                radial-gradient(circle at 45% 18%, rgba(255,255,255,.34), transparent 44%);
         }
         .dark .collage-banner-wrapper {
-            opacity: .24;
+            opacity: .36;
         }
         .dark .collage-banner-wrapper::after {
             background:
-                linear-gradient(180deg, rgba(10,15,29,.74), rgba(10,15,29,.88) 42%, rgba(10,15,29,.97)),
-                radial-gradient(circle at 50% 15%, rgba(47,128,193,.18), transparent 48%);
+                linear-gradient(180deg, rgba(10,15,29,.72), rgba(10,15,29,.9) 48%, rgba(10,15,29,.98)),
+                radial-gradient(circle at 45% 18%, rgba(51,166,217,.18), transparent 46%);
         }
-        .collage-shape {
+        .collage-svg-form {
             position: absolute;
-            border-radius: 8px;
-            background:
-                linear-gradient(135deg, rgba(255,255,255,.48), rgba(255,255,255,.08)),
-                var(--shape-color);
-            border: 1px solid rgba(255,255,255,.45);
-            box-shadow: 0 22px 54px rgba(21,31,46,.16);
-            transform: rotate(var(--shape-rotation)) translateZ(0);
-            animation: collage-enter .9s ease-out both, collage-float var(--shape-duration) ease-in-out infinite;
-            animation-delay: var(--shape-delay), calc(var(--shape-delay) + .9s);
+            left: 50%;
+            top: 42%;
+            width: 92%;
+            height: 82%;
+            pointer-events: none;
+            overflow: visible;
+            opacity: .42;
+            transform: translate(-50%, -50%) translateZ(0);
+            animation: floatAnimation 6s ease-in-out infinite;
+            will-change: transform, opacity;
         }
-        .collage-shape::before,
-        .collage-shape::after {
+        .collage-svg-form svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible;
+            shape-rendering: geometricPrecision;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,.1));
+        }
+        .collage-svg-form-1 { animation-delay: 0s; animation-duration: 8s; z-index: 1; }
+        .collage-svg-form-2 { animation-delay: -2.5s; animation-duration: 7s; z-index: 10; }
+        .collage-svg-form-3 { animation-delay: -5s; animation-duration: 9s; z-index: 26; }
+        .collage-svg-form-1 svg { animation: gradientWave1 6s ease-in-out infinite; }
+        .collage-svg-form-2 svg { animation: gradientWave2 7s ease-in-out infinite; }
+        .collage-svg-form-3 svg { animation: gradientWave3 8s ease-in-out infinite; }
+        .collage-image {
+            position: absolute;
+            border-radius: 15px;
+            overflow: hidden;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,.46), rgba(255,255,255,.08)),
+                var(--shape-color);
+            border: 1px solid rgba(255,255,255,.48);
+            box-shadow: 0 8px 25px rgba(0,0,0,.15);
+            transform: rotate(var(--shape-rotation)) translateZ(0);
+            transition: all 1.5s cubic-bezier(.4,0,.2,1);
+            animation: fadeInRotate 1s ease-out both, collageCardFloat var(--shape-duration) ease-in-out infinite;
+            animation-delay: var(--shape-delay), calc(var(--shape-delay) + 1s);
+            will-change: transform, opacity;
+        }
+        .collage-image::before,
+        .collage-image::after {
             content: "";
             position: absolute;
             border-radius: 999px;
-            background: rgba(255,255,255,.44);
+            background: rgba(255,255,255,.42);
         }
-        .collage-shape::before {
+        .collage-image::before {
             width: 38%;
             height: 38%;
             left: 14%;
             top: 14%;
         }
-        .collage-shape::after {
+        .collage-image::after {
             width: 58%;
             height: 16%;
             right: 12%;
@@ -298,46 +330,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
         .collage-dot {
             position: absolute;
-            border-radius: 999px;
-            box-shadow: 0 10px 24px rgba(21,31,46,.18);
-            animation: dot-drift 5.8s ease-in-out infinite;
+            border-radius: 50%;
+            z-index: 30;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+            animation: pulse 2s ease-in-out infinite;
             animation-delay: var(--dot-delay);
-        }
-        .network-lines-background {
-            position: fixed;
-            inset: -8% -12%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
-            opacity: .5;
-            mix-blend-mode: multiply;
-        }
-        .dark .network-lines-background {
-            opacity: .32;
-            mix-blend-mode: screen;
-        }
-        .network-lines-background svg {
-            width: 124%;
-            height: 124%;
-            transform: translate3d(-8%, -6%, 0);
-        }
-        .network-line {
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            stroke-width: 18;
-            stroke-dasharray: 1500;
-            filter: drop-shadow(0 12px 18px rgba(21,31,46,.08));
-            animation: network-line-flow 18s ease-in-out infinite alternate;
-        }
-        .network-line.line-blue { stroke: rgba(47,128,193,.42); animation-delay: 0s; }
-        .network-line.line-cyan { stroke: rgba(51,166,217,.38); animation-delay: -3s; }
-        .network-line.line-pink { stroke: rgba(237,79,154,.35); animation-delay: -6s; }
-        .network-line.line-yellow { stroke: rgba(242,207,67,.42); animation-delay: -9s; }
-        .network-line.line-green { stroke: rgba(120,189,67,.36); animation-delay: -12s; }
-        .network-node {
-            filter: drop-shadow(0 8px 14px rgba(21,31,46,.12));
-            animation: network-node-pulse 5.5s ease-in-out infinite;
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
         .dot-red { background: var(--nr-red); }
         .dot-blue { background: var(--nr-cyan); }
@@ -349,31 +348,46 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             position: relative;
             z-index: 1;
         }
-        @keyframes collage-enter {
-            from { opacity: 0; transform: rotate(var(--shape-rotation)) translateY(18px) scale(.94); }
-            to { opacity: 1; transform: rotate(var(--shape-rotation)) translateY(0) scale(1); }
+        @keyframes floatAnimation {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0) rotate(0deg) translateZ(0); }
+            33% { transform: translate(-50%, -50%) translateY(-8px) rotate(.5deg) translateZ(0); }
+            66% { transform: translate(-50%, -50%) translateY(8px) rotate(-.5deg) translateZ(0); }
         }
-        @keyframes collage-float {
+        @keyframes gradientWave1 {
+            0%, 100% { filter: drop-shadow(0 2px 8px rgba(0,0,0,.1)) brightness(1) contrast(1) saturate(1) hue-rotate(0deg); }
+            25% { filter: drop-shadow(0 4px 12px rgba(0,163,211,.3)) brightness(1.1) contrast(1.1) saturate(1.2) hue-rotate(10deg); }
+            50% { filter: drop-shadow(0 2px 8px rgba(235,93,152,.3)) brightness(1.15) contrast(1.05) saturate(1.3) hue-rotate(-10deg); }
+            75% { filter: drop-shadow(0 4px 12px rgba(255,207,0,.25)) brightness(1.1) contrast(1.1) saturate(1.2) hue-rotate(5deg); }
+        }
+        @keyframes gradientWave2 {
+            0%, 100% { filter: drop-shadow(0 2px 8px rgba(0,0,0,.1)) brightness(1) contrast(1) saturate(1) hue-rotate(0deg); }
+            33% { filter: drop-shadow(0 4px 12px rgba(76,175,80,.3)) brightness(1.12) contrast(1.08) saturate(1.25) hue-rotate(15deg); }
+            66% { filter: drop-shadow(0 3px 10px rgba(255,107,53,.3)) brightness(1.08) contrast(1.12) saturate(1.2) hue-rotate(-15deg); }
+        }
+        @keyframes gradientWave3 {
+            0%, 100% { filter: drop-shadow(0 2px 8px rgba(0,0,0,.1)) brightness(1) contrast(1) saturate(1) hue-rotate(0deg); }
+            20% { filter: drop-shadow(0 4px 14px rgba(235,93,152,.4)) brightness(1.15) contrast(1.1) saturate(1.3) hue-rotate(-20deg); }
+            40% { filter: drop-shadow(0 4px 14px rgba(0,163,211,.4)) brightness(1.12) contrast(1.08) saturate(1.25) hue-rotate(20deg); }
+            60% { filter: drop-shadow(0 4px 14px rgba(255,207,0,.4)) brightness(1.18) contrast(1.12) saturate(1.35) hue-rotate(10deg); }
+            80% { filter: drop-shadow(0 4px 14px rgba(76,175,80,.35)) brightness(1.1) contrast(1.05) saturate(1.2) hue-rotate(-10deg); }
+        }
+        @keyframes fadeInRotate {
+            from { opacity: 0; transform: scale(.8) rotate(-5deg) translateZ(0); }
+            to { opacity: 1; transform: rotate(var(--shape-rotation)) translateZ(0); }
+        }
+        @keyframes collageCardFloat {
             0%, 100% { translate: 0 0; }
             50% { translate: 0 -14px; }
         }
-        @keyframes dot-drift {
-            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-            50% { transform: translate3d(10px, -16px, 0) scale(1.08); }
-        }
-        @keyframes network-line-flow {
-            0% { stroke-dashoffset: 130; transform: translate3d(0, 0, 0); }
-            100% { stroke-dashoffset: -180; transform: translate3d(16px, -10px, 0); }
-        }
-        @keyframes network-node-pulse {
-            0%, 100% { transform: scale(1); opacity: .72; }
-            50% { transform: scale(1.12); opacity: .95; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) translateZ(0); opacity: .8; }
+            50% { transform: scale(1.2) translateZ(0); opacity: 1; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .collage-shape,
             .collage-dot,
-            .network-line,
-            .network-node {
+            .collage-image,
+            .collage-svg-form,
+            .collage-svg-form svg {
                 animation: none !important;
             }
         }
@@ -607,17 +621,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <body class="bg-slate-50 dark:bg-[#0a0f1d] text-slate-800 dark:text-slate-100 font-sans min-h-screen transition-colors duration-300">
 
     <div class="collage-banner-wrapper" aria-hidden="true">
-        <div class="collage-shape" style="left:6%;top:8%;width:19%;height:25%;--shape-color:rgba(47,128,193,.68);--shape-rotation:-2deg;--shape-duration:7s;--shape-delay:.05s;"></div>
-        <div class="collage-shape" style="left:32%;top:6%;width:16%;height:21%;--shape-color:rgba(242,207,67,.72);--shape-rotation:1deg;--shape-duration:8.2s;--shape-delay:.15s;"></div>
-        <div class="collage-shape" style="left:58%;top:4%;width:14%;height:10%;--shape-color:rgba(120,189,67,.72);--shape-rotation:-1.5deg;--shape-duration:7.6s;--shape-delay:.25s;"></div>
-        <div class="collage-shape" style="left:76%;top:10%;width:11%;height:14%;--shape-color:rgba(237,79,154,.66);--shape-rotation:2deg;--shape-duration:8.5s;--shape-delay:.35s;"></div>
-        <div class="collage-shape" style="left:10%;top:32%;width:15%;height:11%;--shape-color:rgba(233,75,60,.64);--shape-rotation:1.5deg;--shape-duration:7.8s;--shape-delay:.45s;"></div>
-        <div class="collage-shape" style="left:26%;top:30%;width:21%;height:16%;--shape-color:rgba(51,166,217,.62);--shape-rotation:-1deg;--shape-duration:9s;--shape-delay:.55s;"></div>
-        <div class="collage-shape" style="left:54%;top:32%;width:14%;height:19%;--shape-color:rgba(242,207,67,.68);--shape-rotation:2.5deg;--shape-duration:8.4s;--shape-delay:.65s;"></div>
-        <div class="collage-shape" style="left:74%;top:38%;width:12%;height:10%;--shape-color:rgba(47,128,193,.62);--shape-rotation:-2deg;--shape-duration:7.2s;--shape-delay:.75s;"></div>
-        <div class="collage-shape" style="left:8%;top:56%;width:17%;height:22%;--shape-color:rgba(237,79,154,.62);--shape-rotation:1deg;--shape-duration:8.8s;--shape-delay:.85s;"></div>
-        <div class="collage-shape" style="left:30%;top:60%;width:17%;height:22%;--shape-color:rgba(120,189,67,.66);--shape-rotation:-1.5deg;--shape-duration:7.4s;--shape-delay:.95s;"></div>
-        <div class="collage-shape" style="left:54%;top:68%;width:25%;height:19%;--shape-color:rgba(233,75,60,.58);--shape-rotation:2deg;--shape-duration:9.2s;--shape-delay:1.05s;"></div>
+        <div class="collage-svg-form collage-svg-form-1">
+            <svg viewBox="0 0 469 392" preserveAspectRatio="xMidYMid meet" role="presentation" focusable="false">
+                <path d="M57.8319 7.64365C83.5077 -5.98266 124.972 -4.12781 176.56 35.9405C228.046 75.9297 260.095 92.1183 284.788 96.9698C309.465 101.818 326.833 95.3634 349.134 89.8507C371.507 84.3201 406.14 87.7119 432.316 102.84C445.415 110.41 456.421 120.934 462.701 134.777C468.983 148.627 470.512 165.75 464.735 186.47C458.953 207.209 448.662 219.468 436.253 227.536C423.872 235.586 409.4 239.448 395.328 243.441C381.223 247.445 367.519 251.58 356.49 260.137C345.489 268.672 337.106 281.644 333.748 303.412C330.336 325.524 310.627 345.378 282.609 360.588C254.566 375.812 218.077 386.453 180.865 390.083C143.655 393.713 105.676 390.338 74.6639 377.485C43.6622 364.637 19.6058 342.305 10.2918 308.043C0.48611 293.158 -1.40058 273.512 0.858227 251.846C3.12132 230.139 9.55538 206.319 16.4617 183.068C23.374 159.798 30.7542 137.112 34.9442 117.606C37.0384 107.856 38.3302 98.9241 38.37 91.1329C38.4097 83.3386 37.1962 76.7246 34.3172 71.5792C22.4044 50.288 32.1963 21.2486 57.8319 7.64365Z" fill="#E53935"/>
+            </svg>
+        </div>
+        <div class="collage-svg-form collage-svg-form-2">
+            <svg viewBox="0 0 434 344" preserveAspectRatio="xMidYMid meet" role="presentation" focusable="false">
+                <path d="M146.495 5.79382C180.524 -5.38196 219.962 -1.98269 256.605 30.1425C274.788 46.0836 299.093 57.4016 323.902 68.0126C348.68 78.6104 373.971 88.5072 393.987 101.6C414.019 114.705 428.848 131.06 432.621 154.611C436.389 178.137 429.106 208.728 405.208 250.267C381.303 291.82 356.714 316.274 332.58 329.597C308.437 342.923 284.794 345.087 262.834 342.139C240.888 339.191 220.615 331.136 203.211 324.028C194.5 320.47 186.52 317.155 179.389 314.82C172.252 312.483 166.024 311.15 160.811 311.517C139.316 313.035 124.544 300.744 107.8 284.312C91.0304 267.855 72.2123 247.169 42.5415 231.461C12.5703 215.594 -2.73543 178.745 0.402844 143.974C3.53915 109.225 25.1037 76.4366 68.9595 68.5673C84.047 42.5383 112.582 16.9313 146.495 5.79382Z" fill="#FFCF00"/>
+            </svg>
+        </div>
+        <div class="collage-svg-form collage-svg-form-3">
+            <svg viewBox="0 0 482 258" preserveAspectRatio="xMidYMid meet" role="presentation" focusable="false">
+                <path d="M420.94 0.698361C441.381 -3.23745 461.683 9.49446 475.982 38.0909C483.175 52.4773 482.888 65.7118 478.46 78.6945C474.043 91.6467 465.501 104.36 456.195 117.726C437.55 144.504 415.79 173.992 417.033 213.799C417.348 223.861 415.675 232.014 412.315 238.443C408.952 244.877 403.914 249.555 397.552 252.685C384.853 258.931 366.904 258.999 346.431 254.679C305.463 246.034 254.022 219.743 213.235 189.215C192.902 173.996 176.099 166.666 161.825 164.23C147.561 161.795 135.783 164.243 125.481 168.65C115.157 173.065 106.334 179.435 97.9309 184.875C89.5604 190.294 81.5847 194.805 73.0637 195.314C56.124 196.325 34.8616 186.481 19.6643 169.776C4.45228 153.056 -4.74824 129.391 2.54714 102.7C5.07476 90.9606 14.1009 74.6707 27.7366 59.1798C41.3846 43.675 59.6954 28.9185 80.845 20.2892C102.003 11.6567 126.007 9.15555 151.001 18.1808C175.988 27.2036 201.909 47.7258 226.949 85.0343C245.355 110.397 273.058 123.046 299.668 120.193C326.266 117.34 351.874 98.9885 366.068 62.1349C380.339 25.0786 400.559 4.62269 420.94 0.698361Z" fill="#4C1EC1"/>
+            </svg>
+        </div>
+        <div class="collage-image entering" style="left:6%;top:8%;width:18.8%;height:25.1%;z-index:10;--shape-color:rgba(47,128,193,.68);--shape-rotation:-2deg;--shape-duration:7s;--shape-delay:.05s;"></div>
+        <div class="collage-image entering" style="left:32%;top:6%;width:15.7%;height:21%;z-index:8;--shape-color:rgba(242,207,67,.72);--shape-rotation:1deg;--shape-duration:8.2s;--shape-delay:.15s;"></div>
+        <div class="collage-image entering" style="left:58%;top:4%;width:13.4%;height:10%;z-index:9;--shape-color:rgba(120,189,67,.72);--shape-rotation:-1.5deg;--shape-duration:7.6s;--shape-delay:.25s;"></div>
+        <div class="collage-image entering" style="left:76%;top:10%;width:10.7%;height:14.2%;z-index:7;--shape-color:rgba(237,79,154,.66);--shape-rotation:2deg;--shape-duration:8.5s;--shape-delay:.35s;"></div>
+        <div class="collage-image entering" style="left:10%;top:32%;width:15.2%;height:11.4%;z-index:6;--shape-color:rgba(233,75,60,.64);--shape-rotation:1.5deg;--shape-duration:7.8s;--shape-delay:.45s;"></div>
+        <div class="collage-image entering" style="left:26%;top:30%;width:21.1%;height:15.9%;z-index:15;--shape-color:rgba(51,166,217,.62);--shape-rotation:-1deg;--shape-duration:9s;--shape-delay:.55s;"></div>
+        <div class="collage-image entering" style="left:54%;top:32%;width:13.9%;height:18.6%;z-index:11;--shape-color:rgba(242,207,67,.68);--shape-rotation:2.5deg;--shape-duration:8.4s;--shape-delay:.65s;"></div>
+        <div class="collage-image entering" style="left:74%;top:38%;width:11.9%;height:10%;z-index:5;--shape-color:rgba(47,128,193,.62);--shape-rotation:-2deg;--shape-duration:7.2s;--shape-delay:.75s;"></div>
+        <div class="collage-image entering" style="left:8%;top:56%;width:16.7%;height:22.3%;z-index:12;--shape-color:rgba(237,79,154,.62);--shape-rotation:1deg;--shape-duration:8.8s;--shape-delay:.85s;"></div>
+        <div class="collage-image entering" style="left:30%;top:60%;width:16.7%;height:22.2%;z-index:13;--shape-color:rgba(120,189,67,.66);--shape-rotation:-1.5deg;--shape-duration:7.4s;--shape-delay:.95s;"></div>
+        <div class="collage-image entering" style="left:54%;top:68%;width:25.3%;height:19%;z-index:14;--shape-color:rgba(233,75,60,.58);--shape-rotation:2deg;--shape-duration:9.2s;--shape-delay:1.05s;"></div>
         <div class="collage-dot dot-red" style="width:17px;height:17px;left:84%;top:3%;--dot-delay:1.3s;"></div>
         <div class="collage-dot dot-blue" style="width:19px;height:19px;left:70%;top:31%;--dot-delay:.9s;"></div>
         <div class="collage-dot dot-orange" style="width:15px;height:15px;left:74%;top:73%;--dot-delay:1.38s;"></div>
@@ -628,21 +657,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="collage-dot dot-pink" style="width:23px;height:23px;left:83%;top:18%;--dot-delay:1.94s;"></div>
         <div class="collage-dot dot-green" style="width:21px;height:21px;left:19%;top:48%;--dot-delay:.72s;"></div>
         <div class="collage-dot dot-yellow" style="width:14px;height:14px;left:38%;top:23%;--dot-delay:.58s;"></div>
-    </div>
-
-    <div class="network-lines-background" aria-hidden="true">
-        <svg viewBox="0 0 1600 1200" preserveAspectRatio="none" role="presentation" focusable="false">
-            <path class="network-line line-blue" d="M-140 248 C 120 120, 315 355, 520 235 S 890 95, 1080 265 S 1435 520, 1740 310" />
-            <path class="network-line line-yellow" d="M-120 532 C 170 460, 275 705, 535 626 S 875 335, 1125 470 S 1415 700, 1745 592" />
-            <path class="network-line line-pink" d="M-160 835 C 120 700, 320 970, 590 820 S 905 612, 1145 760 S 1440 1040, 1750 848" />
-            <path class="network-line line-cyan" d="M80 -90 C 160 180, 75 360, 260 520 S 540 690, 505 925 S 620 1185, 870 1290" />
-            <path class="network-line line-green" d="M1320 -110 C 1180 155, 1385 330, 1195 548 S 980 840, 1128 1050 S 1305 1245, 1180 1330" />
-            <circle class="network-node" cx="520" cy="235" r="14" fill="#2f80c1" />
-            <circle class="network-node" cx="535" cy="626" r="12" fill="#f2cf43" />
-            <circle class="network-node" cx="1145" cy="760" r="13" fill="#ed4f9a" />
-            <circle class="network-node" cx="1195" cy="548" r="12" fill="#78bd43" />
-            <circle class="network-node" cx="260" cy="520" r="10" fill="#33a6d9" />
-        </svg>
     </div>
 
     <div class="dashboard-shell max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6">

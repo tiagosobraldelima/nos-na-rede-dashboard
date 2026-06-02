@@ -118,8 +118,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Indicações - Nós na Rede Alagoas</title>
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="icon" type="image/png" href="assets/favicon.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="assets/favicon.png" sizes="192x192">
     <link rel="apple-touch-icon" href="assets/favicon.png">
+    <meta name="msapplication-TileImage" content="assets/favicon.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

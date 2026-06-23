@@ -151,6 +151,22 @@ select {
     font-size: 0.9rem;
 }
 
+.brand-heading {
+    display: grid;
+    grid-template-columns: clamp(7rem, 14vw, 11rem) minmax(0, 1fr);
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: center;
+}
+
+.project-logo {
+    width: 100%;
+    max-width: 11rem;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 28px rgba(47, 128, 193, 0.16));
+}
+
 .dashboard {
     width: min(calc(100% - 2rem), var(--max-width));
     margin: 1.25rem auto 0;
@@ -519,6 +535,10 @@ tbody tr:last-child td {
         grid-column: 1 / -1;
     }
 
+    .brand-heading {
+        grid-template-columns: 8rem minmax(0, 1fr);
+    }
+
     .update-status {
         grid-column: 1 / -1;
         max-width: none;
@@ -542,6 +562,15 @@ tbody tr:last-child td {
         margin-top: 0.5rem;
         grid-template-columns: 1fr;
         border-radius: 24px;
+    }
+
+    .brand-heading {
+        grid-template-columns: 1fr;
+        justify-items: start;
+    }
+
+    .project-logo {
+        max-width: 8rem;
     }
 
     .site-header h1 {

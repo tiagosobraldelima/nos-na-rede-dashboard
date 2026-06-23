@@ -109,7 +109,7 @@ test('creates automatic dispensa for cursista without first encounter launch', (
   assert.equal(bruno.dispensasAutomaticas, 2);
   assert.equal(bruno.dispensas, 2);
   assert.equal(bruno.periodosValidos, 2);
-  assert.equal(bruno.situacao, CERTIFICATION_STATUS.naoApto);
+  assert.equal(bruno.situacao, CERTIFICATION_STATUS.acompanhamento);
 });
 
 test('marks student as apt when valid periods reach seven', () => {
@@ -127,6 +127,16 @@ test('marks student as apt when valid periods reach seven', () => {
 test('marks student as not apt when remaining periods cannot reach seven', () => {
   const rows = [
     ...baseRows,
+    {
+      ...baseRows[3],
+      nome: 'LANCAMENTO PIRANHAS',
+      cpf: '999',
+      n_inscricao: 'Z1',
+      email: 'lancamento@example.com',
+      n_encontro: '1º',
+      turno_1: 'AUSENTE',
+      turno_2: 'AUSENTE'
+    },
     { ...baseRows[3], n_encontro: '4º', turno_1: 'AUSENTE', turno_2: 'AUSENTE' },
     { ...baseRows[3], n_encontro: '5º', turno_1: 'AUSENTE', turno_2: 'AUSENTE' }
   ];
@@ -165,19 +175,11 @@ test('aggregates breakdown by certification situation', () => {
   assert.deepEqual(model.breakdowns.bySituacao, [
     {
       nome: CERTIFICATION_STATUS.acompanhamento,
-      cursistas: 1,
+      cursistas: 2,
       aptos: 0,
-      acompanhamento: 1,
+      acompanhamento: 2,
       naoAptos: 0,
-      frequenciaMedia: 50
-    },
-    {
-      nome: CERTIFICATION_STATUS.naoApto,
-      cursistas: 1,
-      aptos: 0,
-      acompanhamento: 0,
-      naoAptos: 1,
-      frequenciaMedia: 20
+      frequenciaMedia: 35
     }
   ]);
 });
@@ -222,4 +224,115 @@ test('aggregates breakdown by inscription status', () => {
       frequenciaMedia: 20
     }
   ]);
+});
+
+test('calculates remaining possible periods from launched encounters in the student turma', () => {
+  const rows = [
+    ...[1, 2, 3, 4, 5].map((encontro) => ({
+      ord: `ADV-${encontro}`,
+      nome: 'TURMA AVANCADA',
+      cpf: '444',
+      n_inscricao: 'D1',
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'MACEIÓ',
+      turma: 'AL-AVANCADA',
+      email: 'avancada@example.com',
+      educador_a: 'NAYARA VILELA',
+      n_encontro: `${encontro}º`,
+      data_do_encontro: `2026-05-${String(encontro).padStart(2, '0')}`,
+      turno_1: 'AUSENTE',
+      turno_2: 'AUSENTE',
+      observacoes: ''
+    })),
+    {
+      ord: 'LAG-1',
+      nome: 'TURMA EM ANDAMENTO',
+      cpf: '555',
+      n_inscricao: 'E1',
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'PIRANHAS',
+      turma: 'AL-EM-ANDAMENTO',
+      email: 'andamento@example.com',
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '1º',
+      data_do_encontro: '2026-05-01',
+      turno_1: 'PRESENTE',
+      turno_2: 'PRESENTE',
+      observacoes: ''
+    },
+    {
+      ord: 'LAG-2',
+      nome: 'TURMA EM ANDAMENTO',
+      cpf: '555',
+      n_inscricao: 'E1',
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'PIRANHAS',
+      turma: 'AL-EM-ANDAMENTO',
+      email: 'andamento@example.com',
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '2º',
+      data_do_encontro: '2026-05-08',
+      turno_1: 'AUSENTE',
+      turno_2: 'AUSENTE',
+      observacoes: ''
+    }
+  ];
+  const model = buildAttendanceModel(rows);
+  const student = model.students.find((item) => item.turma === 'AL-EM-ANDAMENTO');
+
+  assert.equal(student.periodosValidos, 2);
+  assert.equal(student.periodosRestantesPossiveis, 6);
+  assert.equal(student.situacao, CERTIFICATION_STATUS.acompanhamento);
+});
+
+test('filters by encounter keeping only students with a launch in that encounter', () => {
+  const rows = [
+    ...baseRows,
+    {
+      ord: '6',
+      nome: 'CARLA SOUZA',
+      cpf: '333',
+      n_inscricao: 'C1',
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'PIRANHAS',
+      turma: 'AL-PIRANHAS',
+      email: 'carla@example.com',
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '1º',
+      data_do_encontro: '2026-05-01',
+      turno_1: 'PRESENTE',
+      turno_2: 'PRESENTE',
+      observacoes: ''
+    }
+  ];
+  const model = buildAttendanceModel(rows);
+  const filtered = applyFilters(model, {
+    turma: 'Todos',
+    municipio: 'Todos',
+    educador: 'Todos',
+    situacao: 'Todos',
+    statusInscricao: 'Todos',
+    encontro: '2º encontro',
+    busca: ''
+  });
+
+  assert.deepEqual(filtered.students.map((student) => student.nome), ['Ana Maria', 'Bruno Lima']);
+  assert.equal(filtered.summary.totalCursistas, 2);
+  assert.equal(filtered.summary.periodosPrevistosTotal, 20);
+  assert.equal(filtered.breakdowns.byTurma.length, 2);
+});
+
+test('filters first encounter including students with automatic dispensa', () => {
+  const model = buildAttendanceModel(baseRows);
+  const filtered = applyFilters(model, {
+    turma: 'Todos',
+    municipio: 'Todos',
+    educador: 'Todos',
+    situacao: 'Todos',
+    statusInscricao: 'Todos',
+    encontro: '1º encontro',
+    busca: ''
+  });
+
+  assert.deepEqual(filtered.students.map((student) => student.nome), ['Ana Maria', 'Bruno Lima']);
 });

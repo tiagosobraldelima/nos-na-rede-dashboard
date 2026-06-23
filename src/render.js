@@ -213,7 +213,7 @@ export function renderStudentTable(students = [], pageSize = readTablePageSize()
   if (!target) return;
 
   if (students.length === 0) {
-    target.innerHTML = '<tr><td colspan="11">Nenhum participante encontrado para os filtros atuais.</td></tr>';
+    target.innerHTML = '<tr><td colspan="10">Nenhum participante encontrado para os filtros atuais.</td></tr>';
     const tableStatus = element('tableDisplayStatus');
     if (tableStatus) {
       tableStatus.textContent = 'Exibindo 0 de 0 participantes do recorte atual.';
@@ -249,7 +249,6 @@ export function renderStudentTable(students = [], pageSize = readTablePageSize()
       <td>${formatNumber(student.periodosValidos)}</td>
       <td>${formatPercent(student.percentualFrequencia)}</td>
       <td><span class="status-badge ${statusClass(student.situacao)}">${escapeHtml(student.situacao)}</span></td>
-      <td>${escapeHtml(student.observacao)}</td>
     </tr>
   `).join('');
 

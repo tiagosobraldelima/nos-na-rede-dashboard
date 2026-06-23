@@ -186,7 +186,7 @@ test('render helpers escape text and render empty states', () => {
     observacao: 'Risco alto: <b>atenção</b>'
   }]);
   assert.match(document.getElementById('studentTable').innerHTML, /&lt;script&gt;bad&lt;\/script&gt;/);
-  assert.match(document.getElementById('studentTable').innerHTML, /&lt;b&gt;atenção&lt;\/b&gt;/);
+  assert.doesNotMatch(document.getElementById('studentTable').innerHTML, /&lt;b&gt;atenção&lt;\/b&gt;/);
 });
 
 test('renderStudentTable respects the selected row limit without changing the filtered total', () => {

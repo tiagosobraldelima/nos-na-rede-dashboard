@@ -35,17 +35,48 @@ export function normalizeValue(value) {
   return removeAccents(value).trim().replace(/\s+/g, ' ').toUpperCase();
 }
 
-export function normalizeColumnName(value) {
-  const normalized = normalizeValue(value)
-    .replace(/^1O TURNO$|^1 TURNO$|^1º TURNO$/i, 'TURNO 1')
-    .replace(/^2O TURNO$|^2 TURNO$|^2º TURNO$/i, 'TURNO 2')
-    .replace(/^N.? INSCRICAO$/i, 'N INSCRICAO');
+const COLUMN_ALIASES = new Map([
+  ['Nº INSCRICAO', 'N INSCRICAO'],
+  ['N° INSCRICAO', 'N INSCRICAO'],
+  ['N INSCRICAO', 'N INSCRICAO'],
+  ['NUM. INSCRICAO', 'N INSCRICAO'],
+  ['NUM INSCRICAO', 'N INSCRICAO'],
+  ['1º TURNO', 'TURNO 1'],
+  ['1° TURNO', 'TURNO 1'],
+  ['1O TURNO', 'TURNO 1'],
+  ['1 TURNO', 'TURNO 1'],
+  ['2º TURNO', 'TURNO 2'],
+  ['2° TURNO', 'TURNO 2'],
+  ['2O TURNO', 'TURNO 2'],
+  ['2 TURNO', 'TURNO 2'],
+]);
 
-  return normalized
+export function normalizeColumnName(value) {
+  const normalized = normalizeValue(value);
+  const aliased = COLUMN_ALIASES.get(normalized) ?? normalized;
+
+  return aliased
     .toLowerCase()
     .replace(/\(([^)]*)\)/g, '_$1')
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
+}
+
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function titleCaseWord(word, wordIndex) {
+  return word
+    .split(/(['’])/)
+    .map((part, partIndex) => {
+      if (part === "'" || part === '’') return part;
+      if (partIndex === 0 && part.length === 1) {
+        return wordIndex === 0 ? capitalize(part) : part;
+      }
+      return capitalize(part);
+    })
+    .join('');
 }
 
 export function titleCasePtBr(value) {
@@ -58,19 +89,13 @@ export function titleCasePtBr(value) {
     .map((word, index) => {
       if (index > 0 && connectors.has(word)) return word;
 
-      if (word.includes("'")) {
-        return word
-          .split("'")
-          .map((part, partIndex) => {
-            if (partIndex === 0 && part.length === 1) return part;
-            return part.charAt(0).toUpperCase() + part.slice(1);
-          })
-          .join("'");
+      if (word.includes("'") || word.includes('’')) {
+        return titleCaseWord(word, index);
       }
 
       return word
         .split('-')
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .map((part) => capitalize(part))
         .join('-');
     })
     .join(' ');

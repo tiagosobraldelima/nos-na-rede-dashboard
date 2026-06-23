@@ -6,6 +6,7 @@ import { bindReportDownloads } from './reports.js';
 import {
   bindFilterEvents,
   populateFilters,
+  readTablePageSize,
   readFilters,
   renderKpis,
   renderLoadState,
@@ -72,6 +73,8 @@ export function startApp() {
   bindFilterEvents(render);
   bindReportDownloads(() => ({
     model: currentFilteredModel,
+    fullModel: baseModel,
+    tablePageSize: readTablePageSize(),
     filters: readFilters()
   }));
   loadData();

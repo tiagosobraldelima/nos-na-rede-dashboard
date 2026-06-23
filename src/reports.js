@@ -533,6 +533,18 @@ export function downloadTableXlsx(model, filters) {
   XLSX.writeFile(workbook, reportFilename('base-analitica', 'xlsx'));
 }
 
+export function resolveDownloadModel(context = {}, scope = 'filtered') {
+  if (
+    scope === 'table'
+    && context.tablePageSize === 'all'
+    && context.fullModel
+  ) {
+    return context.fullModel;
+  }
+
+  return context.model;
+}
+
 function setStatus(targetId, message, isError = false) {
   const target = document.getElementById(targetId);
   if (!target) return;
@@ -540,15 +552,20 @@ function setStatus(targetId, message, isError = false) {
   target.classList.toggle('is-error', isError);
 }
 
-async function runDownload(getContext, downloadFn, label, statusTargetId) {
-  const { model, filters } = getContext();
+async function runDownload(getContext, downloadFn, label, statusTargetId, scope) {
+  const context = getContext();
+  const model = resolveDownloadModel(context, scope);
+  const { filters } = context;
   if (!model) {
     setStatus(statusTargetId, 'Aguarde o carregamento dos dados antes de baixar o relatório.', true);
     return;
   }
 
   try {
-    setStatus(statusTargetId, `Gerando relatório ${label}...`);
+    const fullBaseMessage = scope === 'table' && context.tablePageSize === 'all'
+      ? ' com a base completa'
+      : '';
+    setStatus(statusTargetId, `Gerando relatório ${label}${fullBaseMessage}...`);
     await downloadFn(model, filters);
     setStatus(statusTargetId, `Relatório ${label} gerado com sucesso.`);
   } catch (error) {
@@ -559,17 +576,17 @@ async function runDownload(getContext, downloadFn, label, statusTargetId) {
 
 export function bindReportDownloads(getContext) {
   const handlers = [
-    ['downloadRiskPdf', downloadPriorityPdf, 'PDF', 'riskReportStatus'],
-    ['downloadRiskCsv', downloadPriorityCsv, 'CSV', 'riskReportStatus'],
-    ['downloadRiskXlsx', downloadPriorityXlsx, 'XLSX', 'riskReportStatus'],
-    ['downloadTablePdf', downloadTablePdf, 'PDF', 'tableReportStatus'],
-    ['downloadTableCsv', downloadTableCsv, 'CSV', 'tableReportStatus'],
-    ['downloadTableXlsx', downloadTableXlsx, 'XLSX', 'tableReportStatus']
+    ['downloadRiskPdf', downloadPriorityPdf, 'PDF', 'riskReportStatus', 'filtered'],
+    ['downloadRiskCsv', downloadPriorityCsv, 'CSV', 'riskReportStatus', 'filtered'],
+    ['downloadRiskXlsx', downloadPriorityXlsx, 'XLSX', 'riskReportStatus', 'filtered'],
+    ['downloadTablePdf', downloadTablePdf, 'PDF', 'tableReportStatus', 'table'],
+    ['downloadTableCsv', downloadTableCsv, 'CSV', 'tableReportStatus', 'table'],
+    ['downloadTableXlsx', downloadTableXlsx, 'XLSX', 'tableReportStatus', 'table']
   ];
 
-  for (const [id, handler, label, statusTargetId] of handlers) {
+  for (const [id, handler, label, statusTargetId, scope] of handlers) {
     const button = document.getElementById(id);
     if (!button) continue;
-    button.addEventListener('click', () => runDownload(getContext, handler, label, statusTargetId));
+    button.addEventListener('click', () => runDownload(getContext, handler, label, statusTargetId, scope));
   }
 }

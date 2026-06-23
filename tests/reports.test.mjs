@@ -6,7 +6,8 @@ import {
   buildPriorityReportData,
   buildTableReportCsv,
   buildTableReportData,
-  getPriorityStudents
+  getPriorityStudents,
+  resolveDownloadModel
 } from '../src/reports.js';
 
 const students = [
@@ -175,4 +176,36 @@ test('buildPriorityReportCsv includes institutional header, priority table and t
   assert.match(csv, /Ana Silva;Turma A;Educadora 1/);
   assert.match(csv, /Resumo geral por turma/);
   assert.match(csv, /Turma A;3;1;33,3%;1;33,3%/);
+});
+
+test('resolveDownloadModel uses the full base for table downloads when page size is Todos', () => {
+  const filteredModel = { students: students.slice(0, 2) };
+  const fullModel = { students };
+
+  assert.equal(
+    resolveDownloadModel({
+      model: filteredModel,
+      fullModel,
+      tablePageSize: 'all'
+    }, 'table'),
+    fullModel
+  );
+
+  assert.equal(
+    resolveDownloadModel({
+      model: filteredModel,
+      fullModel,
+      tablePageSize: 10
+    }, 'table'),
+    filteredModel
+  );
+
+  assert.equal(
+    resolveDownloadModel({
+      model: filteredModel,
+      fullModel,
+      tablePageSize: 'all'
+    }, 'filtered'),
+    filteredModel
+  );
 });

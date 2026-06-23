@@ -8,7 +8,8 @@ import {
   renderLoadState,
   renderReportSummary,
   renderRiskList,
-  renderStudentTable
+  renderStudentTable,
+  readTablePageSize
 } from '../src/render.js';
 
 class FakeClassList {
@@ -65,6 +66,8 @@ function setupDocument() {
     'reportSummary',
     'riskList',
     'studentTable',
+    'tableDisplayStatus',
+    'tablePageSize',
     'resetFilters'
   ];
 
@@ -184,6 +187,36 @@ test('render helpers escape text and render empty states', () => {
   }]);
   assert.match(document.getElementById('studentTable').innerHTML, /&lt;script&gt;bad&lt;\/script&gt;/);
   assert.match(document.getElementById('studentTable').innerHTML, /&lt;b&gt;atenção&lt;\/b&gt;/);
+});
+
+test('renderStudentTable respects the selected row limit without changing the filtered total', () => {
+  const elements = setupDocument();
+  elements.get('tablePageSize').value = '10';
+  const students = Array.from({ length: 12 }, (_, index) => ({
+    nome: `Cursista ${String(index + 1).padStart(2, '0')}`,
+    turma: 'Turma A',
+    municipio: 'Maceió',
+    educador: 'Educadora',
+    presencas: 1,
+    faltas: index,
+    dispensas: 0,
+    periodosValidos: index,
+    percentualFrequencia: 10,
+    situacao: CERTIFICATION_STATUS.acompanhamento,
+    observacao: 'Atenção'
+  }));
+
+  assert.equal(readTablePageSize(), 10);
+  renderStudentTable(students);
+
+  const html = document.getElementById('studentTable').innerHTML;
+  assert.equal((html.match(/<tr>/g) ?? []).length, 10);
+  assert.match(document.getElementById('tableDisplayStatus').textContent, /Exibindo 10 de 12/);
+
+  elements.get('tablePageSize').value = 'all';
+  assert.equal(readTablePageSize(), 'all');
+  renderStudentTable(students);
+  assert.equal((document.getElementById('studentTable').innerHTML.match(/<tr>/g) ?? []).length, 12);
 });
 
 test('renderReportSummary explains the current filtered cut', () => {

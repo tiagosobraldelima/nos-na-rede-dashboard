@@ -10,6 +10,8 @@ const FILTER_IDS = {
   busca: 'filterBusca'
 };
 
+const TABLE_PAGE_SIZE_ID = 'tablePageSize';
+
 function element(id) {
   return document.getElementById(id);
 }
@@ -199,12 +201,23 @@ export function renderRiskList(students = []) {
   `).join('');
 }
 
-export function renderStudentTable(students = []) {
+export function readTablePageSize() {
+  const value = element(TABLE_PAGE_SIZE_ID)?.value ?? '25';
+  if (value === 'all') return 'all';
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 25;
+}
+
+export function renderStudentTable(students = [], pageSize = readTablePageSize()) {
   const target = element('studentTable');
   if (!target) return;
 
   if (students.length === 0) {
     target.innerHTML = '<tr><td colspan="11">Nenhum participante encontrado para os filtros atuais.</td></tr>';
+    const tableStatus = element('tableDisplayStatus');
+    if (tableStatus) {
+      tableStatus.textContent = 'Exibindo 0 de 0 participantes do recorte atual.';
+    }
     return;
   }
 
@@ -220,7 +233,11 @@ export function renderStudentTable(students = []) {
     || String(a.nome).localeCompare(String(b.nome))
   ));
 
-  target.innerHTML = sortedStudents.map((student) => `
+  const visibleStudents = pageSize === 'all'
+    ? sortedStudents
+    : sortedStudents.slice(0, pageSize);
+
+  target.innerHTML = visibleStudents.map((student) => `
     <tr>
       <td>${escapeHtml(student.nome)}</td>
       <td>${escapeHtml(student.turma)}</td>
@@ -235,6 +252,11 @@ export function renderStudentTable(students = []) {
       <td>${escapeHtml(student.observacao)}</td>
     </tr>
   `).join('');
+
+  const tableStatus = element('tableDisplayStatus');
+  if (tableStatus) {
+    tableStatus.textContent = `Exibindo ${formatNumber(visibleStudents.length)} de ${formatNumber(sortedStudents.length)} participantes do recorte atual.`;
+  }
 }
 
 function statusClass(situacao) {
@@ -287,5 +309,10 @@ export function bindFilterEvents(callback) {
       }
       callback();
     });
+  }
+
+  const tablePageSize = element(TABLE_PAGE_SIZE_ID);
+  if (tablePageSize) {
+    tablePageSize.addEventListener('change', callback);
   }
 }

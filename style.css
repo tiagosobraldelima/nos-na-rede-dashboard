@@ -378,12 +378,41 @@ select {
     gap: 0.75rem;
 }
 
-.risk-actions {
+.risk-actions,
+.table-actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.55rem;
     align-items: center;
+}
+
+.table-actions {
+    max-width: 100%;
+}
+
+.page-size-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2rem;
+    padding: 0 0.45rem 0 0.75rem;
+    color: #0f5d7c;
+    background: rgba(51, 166, 217, 0.1);
+    border: 1px solid rgba(51, 166, 217, 0.25);
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.page-size-control select {
+    min-height: 1.55rem;
+    color: var(--color-ink);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(51, 166, 217, 0.22);
+    border-radius: 999px;
+    font-weight: 800;
+    outline: none;
 }
 
 .download-button {
@@ -424,6 +453,8 @@ select {
 }
 
 .risk-report-note,
+.table-report-note,
+.table-display-status,
 .download-status {
     margin: -0.25rem 0 1rem;
     color: var(--color-muted);
@@ -434,6 +465,13 @@ select {
 .download-status {
     min-height: 1.3rem;
     margin-top: -0.55rem;
+    color: #0f5d7c;
+    font-weight: 700;
+}
+
+.table-display-status {
+    margin-top: -0.55rem;
+    margin-bottom: 0.45rem;
     color: #0f5d7c;
     font-weight: 700;
 }
@@ -653,12 +691,19 @@ tbody tr:last-child td {
     .reset-button,
     .update-status,
     .risk-actions,
+    .table-actions,
+    .page-size-control,
     .download-button {
         width: 100%;
     }
 
-    .risk-actions {
+    .risk-actions,
+    .table-actions {
         justify-content: stretch;
+    }
+
+    .page-size-control {
+        justify-content: space-between;
     }
 
     .filters-grid,

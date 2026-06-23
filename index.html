@@ -209,8 +209,37 @@
                     <p class="eyebrow">Base analítica</p>
                     <h2 id="tableTitle">Participantes e presenças</h2>
                 </div>
-                <span class="badge">Tabela filtrável</span>
+                <div class="table-actions" aria-label="Controles da base analítica">
+                    <label class="page-size-control" for="tablePageSize">
+                        Exibir
+                        <select id="tablePageSize">
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">Todos</option>
+                        </select>
+                    </label>
+                    <span class="badge">Tabela filtrável</span>
+                    <button type="button" id="downloadTablePdf" class="download-button download-button-red">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        PDF
+                    </button>
+                    <button type="button" id="downloadTableCsv" class="download-button">
+                        <i class="fa-solid fa-file-csv"></i>
+                        CSV
+                    </button>
+                    <button type="button" id="downloadTableXlsx" class="download-button">
+                        <i class="fa-solid fa-file-excel"></i>
+                        XLSX
+                    </button>
+                </div>
             </div>
+            <p class="table-report-note">
+                Os downloads da base analítica consideram todos os participantes do recorte filtrado atual.
+            </p>
+            <p id="tableDisplayStatus" class="table-display-status" aria-live="polite"></p>
+            <p id="tableReportStatus" class="download-status" aria-live="polite"></p>
             <div class="table-wrap">
                 <table>
                     <thead>

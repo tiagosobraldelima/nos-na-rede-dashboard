@@ -2,7 +2,8 @@ import { CERTIFICATION_STATUS } from './config.js';
 
 const LOGO_PATH = 'assets/nos-na-rede-logo.png';
 const PUBLIC_LOGO_URL = 'https://tiagosobraldelima.github.io/nos-na-rede-dashboard/assets/nos-na-rede-logo.png';
-const REPORT_TITLE = 'Relatório — Atenção prioritária';
+const PRIORITY_REPORT_TITLE = 'Relatório — Atenção prioritária';
+const TABLE_REPORT_TITLE = 'Relatório — Base analítica';
 const CSV_SEPARATOR = ';';
 
 function formatDateTime(value = new Date()) {
@@ -34,9 +35,9 @@ function percent(part, total) {
   return Math.round((part / total) * 1000) / 10;
 }
 
-function reportFilename(extension) {
+function reportFilename(slug, extension) {
   const date = new Date().toISOString().slice(0, 10);
-  return `nos-na-rede-atencao-prioritaria-${date}.${extension}`;
+  return `nos-na-rede-${slug}-${date}.${extension}`;
 }
 
 export function getPriorityStudents(students = []) {
@@ -98,7 +99,7 @@ export function buildPriorityReportData(model = {}, filters = {}) {
     .sort((a, b) => b.naoAptos - a.naoAptos || b.comChance - a.comChance || a.turma.localeCompare(b.turma, 'pt-BR'));
 
   return {
-    title: REPORT_TITLE,
+    title: PRIORITY_REPORT_TITLE,
     generatedAt: new Date(),
     filtersDescription: buildFilterDescription(filters),
     logoPath: LOGO_PATH,
@@ -109,6 +110,46 @@ export function buildPriorityReportData(model = {}, filters = {}) {
       educador: safeText(student.educador)
     })),
     turmaSummary
+  };
+}
+
+function sortStudentsForTable(students = []) {
+  const statusPriority = {
+    [CERTIFICATION_STATUS.naoApto]: 0,
+    [CERTIFICATION_STATUS.acompanhamento]: 1,
+    [CERTIFICATION_STATUS.apto]: 2
+  };
+
+  return [...students].sort((a, b) => (
+    (statusPriority[a.situacao] ?? 9) - (statusPriority[b.situacao] ?? 9)
+    || a.periodosValidos - b.periodosValidos
+    || b.faltas - a.faltas
+    || String(a.nome).localeCompare(String(b.nome), 'pt-BR')
+  ));
+}
+
+export function buildTableReportData(model = {}, filters = {}) {
+  const students = sortStudentsForTable(model.students ?? []);
+
+  return {
+    title: TABLE_REPORT_TITLE,
+    generatedAt: new Date(),
+    filtersDescription: buildFilterDescription(filters),
+    logoPath: LOGO_PATH,
+    logoUrl: PUBLIC_LOGO_URL,
+    rows: students.map((student) => ({
+      nome: safeText(student.nome),
+      turma: safeText(student.turma),
+      municipio: safeText(student.municipio),
+      educador: safeText(student.educador),
+      presencas: Number(student.presencas) || 0,
+      faltas: Number(student.faltas) || 0,
+      dispensas: Number(student.dispensas) || 0,
+      validos: Number(student.periodosValidos) || 0,
+      percentualFrequencia: Number(student.percentualFrequencia) || 0,
+      situacao: safeText(student.situacao),
+      observacao: safeText(student.observacao, '')
+    }))
   };
 }
 
@@ -152,6 +193,47 @@ export function buildPriorityReportCsv(data) {
       formatPercent(row.percentualNaoAptos),
       row.comChance,
       formatPercent(row.percentualComChance)
+    ]))
+  ];
+
+  return `\uFEFF${rows.join('\n')}`;
+}
+
+export function buildTableReportCsv(data) {
+  const rows = [
+    csvRow(['Projeto Nós na Rede']),
+    csvRow([data.title]),
+    csvRow(['Logo do projeto', data.logoUrl]),
+    csvRow(['Gerado em', formatDateTime(data.generatedAt)]),
+    csvRow(['Filtros', data.filtersDescription]),
+    csvRow(['Total de participantes', data.rows.length]),
+    '',
+    csvRow(['Base analítica de participantes e presenças']),
+    csvRow([
+      'Nome',
+      'Turma',
+      'Município',
+      'Educador(a)',
+      'Presenças',
+      'Faltas',
+      'Dispensas',
+      'Válidos',
+      '% frequência',
+      'Situação',
+      'Observação'
+    ]),
+    ...data.rows.map((row) => csvRow([
+      row.nome,
+      row.turma,
+      row.municipio,
+      row.educador,
+      row.presencas,
+      row.faltas,
+      row.dispensas,
+      row.validos,
+      formatPercent(row.percentualFrequencia),
+      row.situacao,
+      row.observacao
     ]))
   ];
 
@@ -204,7 +286,16 @@ export function downloadPriorityCsv(model, filters) {
   downloadBlob(
     buildPriorityReportCsv(data),
     'text/csv;charset=utf-8',
-    reportFilename('csv')
+    reportFilename('atencao-prioritaria', 'csv')
+  );
+}
+
+export function downloadTableCsv(model, filters) {
+  const data = buildTableReportData(model, filters);
+  downloadBlob(
+    buildTableReportCsv(data),
+    'text/csv;charset=utf-8',
+    reportFilename('base-analitica', 'csv')
   );
 }
 
@@ -262,7 +353,77 @@ export async function downloadPriorityPdf(model, filters) {
     margin: { left: 14, right: 14 }
   });
 
-  doc.save(reportFilename('pdf'));
+  doc.save(reportFilename('atencao-prioritaria', 'pdf'));
+}
+
+export async function downloadTablePdf(model, filters) {
+  const data = buildTableReportData(model, filters);
+  const jsPDF = ensureJsPdf();
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
+  const logoDataUrl = await loadLogoDataUrl().catch(() => null);
+
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'PNG', 14, 10, 22, 22);
+  }
+
+  doc.setTextColor(23, 32, 51);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text(data.title, 42, 18);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(`Projeto Nós na Rede • Gerado em ${formatDateTime(data.generatedAt)}`, 42, 24);
+  doc.text(`Filtros: ${data.filtersDescription}`, 42, 30);
+  doc.text(`Total de participantes no relatório: ${data.rows.length}`, 42, 36);
+
+  doc.autoTable({
+    startY: 44,
+    head: [[
+      'Nome',
+      'Turma',
+      'Município',
+      'Educador(a)',
+      'Pres.',
+      'Faltas',
+      'Disp.',
+      'Válidos',
+      '% freq.',
+      'Situação',
+      'Observação'
+    ]],
+    body: data.rows.map((row) => [
+      row.nome,
+      row.turma,
+      row.municipio,
+      row.educador,
+      row.presencas,
+      row.faltas,
+      row.dispensas,
+      row.validos,
+      formatPercent(row.percentualFrequencia),
+      row.situacao,
+      row.observacao
+    ]),
+    styles: { fontSize: 6.2, cellPadding: 1.6, overflow: 'linebreak' },
+    headStyles: { fillColor: [47, 128, 193], textColor: 255 },
+    alternateRowStyles: { fillColor: [247, 251, 255] },
+    columnStyles: {
+      0: { cellWidth: 44 },
+      1: { cellWidth: 38 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 38 },
+      4: { halign: 'center', cellWidth: 14 },
+      5: { halign: 'center', cellWidth: 14 },
+      6: { halign: 'center', cellWidth: 14 },
+      7: { halign: 'center', cellWidth: 14 },
+      8: { halign: 'center', cellWidth: 16 },
+      9: { cellWidth: 40 },
+      10: { cellWidth: 58 }
+    },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save(reportFilename('base-analitica', 'pdf'));
 }
 
 export function downloadPriorityXlsx(model, filters) {
@@ -311,43 +472,104 @@ export function downloadPriorityXlsx(model, filters) {
 
   XLSX.utils.book_append_sheet(workbook, prioritySheet, 'Atenção prioritária');
   XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumo por turma');
-  XLSX.writeFile(workbook, reportFilename('xlsx'));
+  XLSX.writeFile(workbook, reportFilename('atencao-prioritaria', 'xlsx'));
 }
 
-function setStatus(message, isError = false) {
-  const target = document.getElementById('riskReportStatus');
+export function downloadTableXlsx(model, filters) {
+  const data = buildTableReportData(model, filters);
+  const XLSX = ensureXlsx();
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    ['Projeto Nós na Rede'],
+    [data.title],
+    ['Logo do projeto', data.logoUrl],
+    ['Gerado em', formatDateTime(data.generatedAt)],
+    ['Filtros', data.filtersDescription],
+    ['Total de participantes', data.rows.length],
+    [],
+    [
+      'Nome',
+      'Turma',
+      'Município',
+      'Educador(a)',
+      'Presenças',
+      'Faltas',
+      'Dispensas',
+      'Válidos',
+      '% frequência',
+      'Situação',
+      'Observação'
+    ],
+    ...data.rows.map((row) => [
+      row.nome,
+      row.turma,
+      row.municipio,
+      row.educador,
+      row.presencas,
+      row.faltas,
+      row.dispensas,
+      row.validos,
+      row.percentualFrequencia / 100,
+      row.situacao,
+      row.observacao
+    ])
+  ]);
+
+  worksheet['!cols'] = [
+    { wch: 34 },
+    { wch: 32 },
+    { wch: 24 },
+    { wch: 32 },
+    { wch: 12 },
+    { wch: 10 },
+    { wch: 12 },
+    { wch: 10 },
+    { wch: 14 },
+    { wch: 34 },
+    { wch: 54 }
+  ];
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Base analítica');
+  XLSX.writeFile(workbook, reportFilename('base-analitica', 'xlsx'));
+}
+
+function setStatus(targetId, message, isError = false) {
+  const target = document.getElementById(targetId);
   if (!target) return;
   target.textContent = message;
   target.classList.toggle('is-error', isError);
 }
 
-async function runDownload(getContext, downloadFn, label) {
+async function runDownload(getContext, downloadFn, label, statusTargetId) {
   const { model, filters } = getContext();
   if (!model) {
-    setStatus('Aguarde o carregamento dos dados antes de baixar o relatório.', true);
+    setStatus(statusTargetId, 'Aguarde o carregamento dos dados antes de baixar o relatório.', true);
     return;
   }
 
   try {
-    setStatus(`Gerando relatório ${label}...`);
+    setStatus(statusTargetId, `Gerando relatório ${label}...`);
     await downloadFn(model, filters);
-    setStatus(`Relatório ${label} gerado com sucesso.`);
+    setStatus(statusTargetId, `Relatório ${label} gerado com sucesso.`);
   } catch (error) {
     console.error(`Erro ao gerar relatório ${label}:`, error);
-    setStatus(error?.message ?? `Não foi possível gerar o relatório ${label}.`, true);
+    setStatus(statusTargetId, error?.message ?? `Não foi possível gerar o relatório ${label}.`, true);
   }
 }
 
 export function bindReportDownloads(getContext) {
   const handlers = [
-    ['downloadRiskPdf', downloadPriorityPdf, 'PDF'],
-    ['downloadRiskCsv', downloadPriorityCsv, 'CSV'],
-    ['downloadRiskXlsx', downloadPriorityXlsx, 'XLSX']
+    ['downloadRiskPdf', downloadPriorityPdf, 'PDF', 'riskReportStatus'],
+    ['downloadRiskCsv', downloadPriorityCsv, 'CSV', 'riskReportStatus'],
+    ['downloadRiskXlsx', downloadPriorityXlsx, 'XLSX', 'riskReportStatus'],
+    ['downloadTablePdf', downloadTablePdf, 'PDF', 'tableReportStatus'],
+    ['downloadTableCsv', downloadTableCsv, 'CSV', 'tableReportStatus'],
+    ['downloadTableXlsx', downloadTableXlsx, 'XLSX', 'tableReportStatus']
   ];
 
-  for (const [id, handler, label] of handlers) {
+  for (const [id, handler, label, statusTargetId] of handlers) {
     const button = document.getElementById(id);
     if (!button) continue;
-    button.addEventListener('click', () => runDownload(getContext, handler, label));
+    button.addEventListener('click', () => runDownload(getContext, handler, label, statusTargetId));
   }
 }

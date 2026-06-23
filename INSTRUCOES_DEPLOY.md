@@ -27,4 +27,4 @@ npm test
 npm run serve
 ```
 
-Com o servidor local ativo, abra `http://localhost:8080` e confirme que o dashboard carrega os dados da planilha CSV pública, atualiza os indicadores e mantém filtros, busca, tabela e exportação CSV funcionando.
+Com o servidor local ativo, abra `http://localhost:8080` e confirme que o dashboard carrega os dados da planilha CSV pública, atualiza os indicadores e mantém filtros, busca, gráficos e tabela funcionando.

@@ -2,7 +2,12 @@
 
 Dashboard estático para acompanhar presenças, dispensas, atestados e a situação de certificação por frequência das participantes do Projeto Nós na Rede.
 
-O painel lê dados publicados em CSV pelo Google Sheets, calcula o critério de frequência no navegador e apresenta indicadores, filtros, tabela detalhada e exportação CSV. Ele foi pensado para publicação simples via GitHub Pages, sem backend próprio.
+O painel lê dados publicados em CSV pelo Google Sheets, calcula o critério de frequência no navegador e apresenta indicadores, filtros, gráficos e tabela detalhada. Ele foi pensado para publicação simples via GitHub Pages, sem backend próprio.
+
+## Links
+
+- Repositório: https://github.com/tiagosobraldelima/nos-na-rede-dashboard
+- Dashboard público previsto via GitHub Pages: https://tiagosobraldelima.github.io/nos-na-rede-dashboard/
 
 ## Fonte de dados
 
@@ -81,5 +86,5 @@ Antes de publicar ou após alterar a planilha/fonte, valide:
 - `PRESENTE`, `DISPENSADO`, `ATESTADO MÉDICO` e dispensa automática do 1º encontro contam como válidos.
 - `AUSENTE` não conta como válido.
 - Vazios em encontros posteriores aparecem como sem registro.
-- Filtros, busca e exportação CSV continuam funcionando.
+- Filtros, busca, gráficos e tabela continuam funcionando.
 - A publicação no GitHub Pages está configurada com `main` e `/ (root)`.

@@ -1,0 +1,12 @@
+{
+  "name": "nos-na-rede-dashboard-presencas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:attendance": "node --test tests/attendanceModel.test.mjs",
+    "test:csv": "node --test tests/csv.test.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}

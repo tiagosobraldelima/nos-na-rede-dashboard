@@ -292,6 +292,8 @@ select {
 }
 
 .kpi-icon.blue { background: var(--color-blue); }
+.kpi-icon.cyan { background: var(--color-cyan); }
+.kpi-icon.pink { background: var(--color-pink); }
 .kpi-icon.green { background: var(--color-green); }
 .kpi-icon.yellow { background: var(--color-yellow); color: #553f00; }
 .kpi-icon.red { background: var(--color-red); }

@@ -14,8 +14,10 @@ import {
 
 let baseModel = null;
 let isLoading = false;
+let appStarted = false;
+let refreshTimerId = null;
 
-function render() {
+export function render() {
   if (!baseModel) return;
 
   const filteredModel = applyFilters(baseModel, readFilters());
@@ -25,7 +27,7 @@ function render() {
   renderCharts(filteredModel);
 }
 
-async function loadData() {
+export async function loadData() {
   if (isLoading) return;
   isLoading = true;
   renderLoadState({ status: 'loading', message: 'Carregando dados da planilha...' });
@@ -51,12 +53,27 @@ async function loadData() {
   }
 }
 
-bindFilterEvents(render);
-loadData();
-setInterval(loadData, REFRESH_INTERVAL_MS);
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    loadData();
+export function startApp() {
+  if (
+    appStarted
+    || typeof document === 'undefined'
+    || typeof window === 'undefined'
+  ) {
+    return refreshTimerId;
   }
-});
+
+  appStarted = true;
+  bindFilterEvents(render);
+  loadData();
+  refreshTimerId = window.setInterval(loadData, REFRESH_INTERVAL_MS);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      loadData();
+    }
+  });
+
+  return refreshTimerId;
+}
+
+startApp();

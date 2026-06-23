@@ -233,7 +233,9 @@ function buildBreakdowns(students) {
     byEncounter,
     byTurma: groupBy('turma'),
     byMunicipio: groupBy('municipio'),
-    byEducador: groupBy('educador')
+    byEducador: groupBy('educador'),
+    bySituacao: groupBy('situacao'),
+    byStatusInscricao: groupBy('statusInscricao')
   };
 }
 

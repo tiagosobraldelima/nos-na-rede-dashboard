@@ -158,3 +158,68 @@ test('aggregates summary and filters by turma, municipio, educator, situation an
   assert.equal(filtered.summary.periodosPorCursista, 10);
   assert.equal(filtered.summary.periodosPrevistosTotal, 10);
 });
+
+test('aggregates breakdown by certification situation', () => {
+  const model = buildAttendanceModel(baseRows);
+
+  assert.deepEqual(model.breakdowns.bySituacao, [
+    {
+      nome: CERTIFICATION_STATUS.acompanhamento,
+      cursistas: 1,
+      aptos: 0,
+      acompanhamento: 1,
+      naoAptos: 0,
+      frequenciaMedia: 50
+    },
+    {
+      nome: CERTIFICATION_STATUS.naoApto,
+      cursistas: 1,
+      aptos: 0,
+      acompanhamento: 0,
+      naoAptos: 1,
+      frequenciaMedia: 20
+    }
+  ]);
+});
+
+test('aggregates breakdown by inscription status', () => {
+  const rows = [
+    ...baseRows,
+    {
+      ord: '6',
+      nome: 'CARLA SOUZA',
+      cpf: '333',
+      n_inscricao: 'C1',
+      status_da_inscricao: 'CANCELADO',
+      municipio: 'PIRANHAS',
+      turma: 'AL-PIRANHAS',
+      email: 'carla@example.com',
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '1º',
+      data_do_encontro: '2026-05-01',
+      turno_1: 'PRESENTE',
+      turno_2: 'PRESENTE',
+      observacoes: ''
+    }
+  ];
+  const model = buildAttendanceModel(rows);
+
+  assert.deepEqual(model.breakdowns.byStatusInscricao, [
+    {
+      nome: 'INSCRITO',
+      cursistas: 2,
+      aptos: 0,
+      acompanhamento: 1,
+      naoAptos: 1,
+      frequenciaMedia: 35
+    },
+    {
+      nome: 'CANCELADO',
+      cursistas: 1,
+      aptos: 0,
+      acompanhamento: 0,
+      naoAptos: 1,
+      frequenciaMedia: 20
+    }
+  ]);
+});

@@ -202,10 +202,10 @@ export function renderRiskList(students = []) {
 }
 
 export function readTablePageSize() {
-  const value = element(TABLE_PAGE_SIZE_ID)?.value ?? '25';
+  const value = element(TABLE_PAGE_SIZE_ID)?.value ?? '10';
   if (value === 'all') return 'all';
   const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 25;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
 }
 
 export function renderStudentTable(students = [], pageSize = readTablePageSize()) {

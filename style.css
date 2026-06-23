@@ -16,7 +16,7 @@
     --radius-xl: 32px;
     --radius-lg: 24px;
     --radius-md: 18px;
-    --max-width: 1280px;
+    --max-width: 1480px;
 }
 
 * {
@@ -326,7 +326,7 @@ select {
 .kpi-icon.red { background: var(--color-red); }
 
 .panel {
-    padding: clamp(1rem, 2.5vw, 1.5rem);
+    padding: clamp(1rem, 2.1vw, 1.5rem);
     border-radius: var(--radius-lg);
 }
 
@@ -388,6 +388,7 @@ select {
 }
 
 .table-actions {
+    flex: 1 1 32rem;
     max-width: 100%;
 }
 
@@ -523,28 +524,81 @@ select {
 
 table {
     width: 100%;
-    min-width: 880px;
+    min-width: 1120px;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 th,
 td {
-    padding: 0.95rem 1rem;
+    padding: 0.78rem 0.72rem;
     text-align: left;
     border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+    vertical-align: middle;
+    overflow-wrap: anywhere;
 }
 
 th {
     color: #26334d;
     background: rgba(51, 166, 217, 0.1);
     font-family: "Outfit", "Inter", sans-serif;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     text-transform: uppercase;
     letter-spacing: 0.055em;
 }
 
 td {
     color: var(--color-muted);
+    font-size: 0.92rem;
+    line-height: 1.28;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+    width: 11%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+    width: 15%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 10%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+    width: 13%;
+}
+
+th:nth-child(5),
+td:nth-child(5),
+th:nth-child(6),
+td:nth-child(6),
+th:nth-child(7),
+td:nth-child(7),
+th:nth-child(8),
+td:nth-child(8) {
+    width: 6%;
+    text-align: center;
+}
+
+th:nth-child(9),
+td:nth-child(9) {
+    width: 7%;
+    text-align: center;
+}
+
+th:nth-child(10),
+td:nth-child(10) {
+    width: 12%;
+}
+
+th:nth-child(11),
+td:nth-child(11) {
+    width: 14%;
 }
 
 tbody tr:last-child td {
@@ -573,12 +627,13 @@ tbody tr:last-child td {
 .status-badge {
     display: inline-flex;
     align-items: center;
-    max-width: 18rem;
+    max-width: 100%;
     padding: 0.35rem 0.65rem;
     border-radius: 999px;
     font-weight: 800;
     font-size: 0.78rem;
     line-height: 1.25;
+    white-space: normal;
 }
 
 .status-ok {
@@ -648,6 +703,17 @@ tbody tr:last-child td {
     .update-status {
         grid-column: 1 / -1;
         max-width: none;
+    }
+}
+
+@media (min-width: 1280px) {
+    .table-panel .section-heading {
+        display: grid;
+        grid-template-columns: minmax(22rem, 1fr) minmax(36rem, auto);
+    }
+
+    .table-actions {
+        justify-content: flex-end;
     }
 }
 
@@ -728,5 +794,14 @@ tbody tr:last-child td {
 
     .chart-panel canvas {
         max-height: 15rem;
+    }
+
+    table {
+        min-width: 1050px;
+    }
+
+    th,
+    td {
+        padding: 0.72rem 0.65rem;
     }
 }

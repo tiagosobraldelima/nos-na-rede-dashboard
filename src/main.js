@@ -8,6 +8,7 @@ import {
   readFilters,
   renderKpis,
   renderLoadState,
+  renderReportSummary,
   renderRiskList,
   renderStudentTable
 } from './render.js';
@@ -20,8 +21,10 @@ let refreshTimerId = null;
 export function render() {
   if (!baseModel) return;
 
+  populateFilters(baseModel, readFilters());
   const filteredModel = applyFilters(baseModel, readFilters());
   renderKpis(filteredModel.summary);
+  renderReportSummary(filteredModel.summary);
   renderRiskList(filteredModel.students);
   renderStudentTable(filteredModel.students);
   renderCharts(filteredModel);

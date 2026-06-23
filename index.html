@@ -116,6 +116,19 @@
             </article>
         </section>
 
+        <section class="panel report-panel" aria-labelledby="reportSummaryTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Leitura do recorte</p>
+                    <h2 id="reportSummaryTitle">Resumo interpretativo</h2>
+                </div>
+                <span class="badge">Atualizado pelos filtros</span>
+            </div>
+            <div id="reportSummary" class="report-summary">
+                <p class="empty-state">O resumo será gerado após o carregamento dos dados.</p>
+            </div>
+        </section>
+
         <section class="panel risk-panel" aria-labelledby="riskTitle">
             <div class="section-heading">
                 <div>
@@ -132,22 +145,27 @@
         <section class="charts-grid" aria-label="Gráficos do dashboard">
             <article class="panel chart-panel">
                 <h2>Status de certificação</h2>
+                <p class="chart-description">Distribuição dos cursistas entre aptos, em acompanhamento e não aptos no recorte filtrado.</p>
                 <canvas id="statusChart"></canvas>
             </article>
             <article class="panel chart-panel">
                 <h2>Presença por encontro</h2>
+                <p class="chart-description">Compara presenças, faltas, dispensas e períodos sem registro em cada encontro presencial.</p>
                 <canvas id="encounterChart"></canvas>
             </article>
             <article class="panel chart-panel">
                 <h2>Presença por turma</h2>
+                <p class="chart-description">Mostra a situação dos cursistas em cada turma, facilitando priorização por grupo.</p>
                 <canvas id="turmaChart"></canvas>
             </article>
             <article class="panel chart-panel">
                 <h2>Presença por município</h2>
+                <p class="chart-description">Ajuda a comparar o acompanhamento territorial dos cursistas.</p>
                 <canvas id="municipioChart"></canvas>
             </article>
             <article class="panel chart-panel chart-panel-wide">
                 <h2>Presença por educador(a)</h2>
+                <p class="chart-description">Consolida o acompanhamento das turmas vinculadas a cada educador(a).</p>
                 <canvas id="educadorChart"></canvas>
             </article>
         </section>

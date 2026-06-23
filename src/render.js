@@ -62,10 +62,29 @@ function setSelectOptions(id, options, selectedValue) {
   select.value = selected;
 }
 
+function turmasForSelectedEducador(model, selectedEducador) {
+  const allTurmas = model.options?.turmas ?? [];
+  if (!selectedEducador || selectedEducador === 'Todos') return allTurmas;
+  if (!Array.isArray(model.students) || model.students.length === 0) return allTurmas;
+
+  const linkedTurmas = new Set(
+    (model.students ?? [])
+      .filter((student) => student.educador === selectedEducador)
+      .map((student) => student.turma)
+      .filter(Boolean)
+  );
+
+  return allTurmas.filter((turma) => linkedTurmas.has(turma));
+}
+
 export function populateFilters(model, currentFilters = {}) {
-  setSelectOptions(FILTER_IDS.turma, model.options?.turmas ?? [], currentFilters.turma);
-  setSelectOptions(FILTER_IDS.municipio, model.options?.municipios ?? [], currentFilters.municipio);
   setSelectOptions(FILTER_IDS.educador, model.options?.educadores ?? [], currentFilters.educador);
+  setSelectOptions(
+    FILTER_IDS.turma,
+    turmasForSelectedEducador(model, currentFilters.educador),
+    currentFilters.turma
+  );
+  setSelectOptions(FILTER_IDS.municipio, model.options?.municipios ?? [], currentFilters.municipio);
   setSelectOptions(
     FILTER_IDS.encontro,
     Array.from({ length: TOTAL_ENCOUNTERS }, (_, index) => `${index + 1}º encontro`),
@@ -114,6 +133,39 @@ export function renderKpis(summary = {}) {
   `).join('');
 }
 
+export function renderReportSummary(summary = {}) {
+  const target = element('reportSummary');
+  if (!target) return;
+
+  const total = formatNumber(summary.totalCursistas);
+  const turmas = formatNumber(summary.totalTurmas);
+  const educadores = formatNumber(summary.totalEducadores);
+  const frequencia = formatPercent(summary.percentualGeralFrequencia);
+  const aptos = formatNumber(summary.aptos);
+  const acompanhamento = formatNumber(summary.acompanhamento);
+  const naoAptos = formatNumber(summary.naoAptos);
+  const percentualAptos = formatPercent(summary.percentualAptos);
+  const percentualNaoAptos = formatPercent(summary.percentualNaoAptos);
+
+  target.innerHTML = `
+    <article class="report-card">
+      <span class="report-label">Recorte atual</span>
+      <strong>${total} cursistas</strong>
+      <p>${turmas} turmas acompanhadas por ${educadores} educador(es).</p>
+    </article>
+    <article class="report-card">
+      <span class="report-label">Frequência geral</span>
+      <strong>${frequencia}</strong>
+      <p>Percentual calculado sobre os 10 períodos presenciais previstos por cursista.</p>
+    </article>
+    <article class="report-card">
+      <span class="report-label">Certificação presencial</span>
+      <strong>${aptos} aptos</strong>
+      <p>${acompanhamento} em acompanhamento e ${naoAptos} não aptos (${percentualAptos} aptos; ${percentualNaoAptos} não aptos).</p>
+    </article>
+  `;
+}
+
 export function renderRiskList(students = []) {
   const target = element('riskList');
   if (!target) return;
@@ -156,7 +208,19 @@ export function renderStudentTable(students = []) {
     return;
   }
 
-  target.innerHTML = students.map((student) => `
+  const statusPriority = {
+    [CERTIFICATION_STATUS.naoApto]: 0,
+    [CERTIFICATION_STATUS.acompanhamento]: 1,
+    [CERTIFICATION_STATUS.apto]: 2
+  };
+  const sortedStudents = [...students].sort((a, b) => (
+    (statusPriority[a.situacao] ?? 9) - (statusPriority[b.situacao] ?? 9)
+    || a.periodosValidos - b.periodosValidos
+    || b.faltas - a.faltas
+    || String(a.nome).localeCompare(String(b.nome))
+  ));
+
+  target.innerHTML = sortedStudents.map((student) => `
     <tr>
       <td>${escapeHtml(student.nome)}</td>
       <td>${escapeHtml(student.turma)}</td>
@@ -167,10 +231,16 @@ export function renderStudentTable(students = []) {
       <td>${formatNumber(student.dispensas)}</td>
       <td>${formatNumber(student.periodosValidos)}</td>
       <td>${formatPercent(student.percentualFrequencia)}</td>
-      <td>${escapeHtml(student.situacao)}</td>
+      <td><span class="status-badge ${statusClass(student.situacao)}">${escapeHtml(student.situacao)}</span></td>
       <td>${escapeHtml(student.observacao)}</td>
     </tr>
   `).join('');
+}
+
+function statusClass(situacao) {
+  if (situacao === CERTIFICATION_STATUS.apto) return 'status-ok';
+  if (situacao === CERTIFICATION_STATUS.naoApto) return 'status-danger';
+  return 'status-watch';
 }
 
 export function renderLoadState({ status, message, updatedAt } = {}) {

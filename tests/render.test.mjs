@@ -6,6 +6,7 @@ import {
   readFilters,
   renderKpis,
   renderLoadState,
+  renderReportSummary,
   renderRiskList,
   renderStudentTable
 } from '../src/render.js';
@@ -61,6 +62,7 @@ function setupDocument() {
     'filterStatusInscricao',
     'filterBusca',
     'kpiGrid',
+    'reportSummary',
     'riskList',
     'studentTable',
     'resetFilters'
@@ -112,6 +114,34 @@ test('populateFilters preserves valid selections and readFilters returns the cur
   });
 });
 
+test('populateFilters restricts turma options to the selected educator', () => {
+  setupDocument();
+  const model = {
+    students: [
+      { turma: 'Turma A', educador: 'Educadora 1' },
+      { turma: 'Turma B', educador: 'Educadora 1' },
+      { turma: 'Turma C', educador: 'Educadora 2' }
+    ],
+    options: {
+      turmas: ['Turma A', 'Turma B', 'Turma C'],
+      municipios: ['Maceió'],
+      educadores: ['Educadora 1', 'Educadora 2'],
+      statusInscricao: ['INSCRITO']
+    }
+  };
+
+  populateFilters(model, {
+    educador: 'Educadora 1',
+    turma: 'Turma C'
+  });
+
+  const turmaSelect = document.getElementById('filterTurma');
+  assert.match(turmaSelect.innerHTML, /Turma A/);
+  assert.match(turmaSelect.innerHTML, /Turma B/);
+  assert.doesNotMatch(turmaSelect.innerHTML, /Turma C/);
+  assert.equal(turmaSelect.value, 'Todos');
+});
+
 test('render helpers escape text and render empty states', () => {
   setupDocument();
 
@@ -154,6 +184,29 @@ test('render helpers escape text and render empty states', () => {
   }]);
   assert.match(document.getElementById('studentTable').innerHTML, /&lt;script&gt;bad&lt;\/script&gt;/);
   assert.match(document.getElementById('studentTable').innerHTML, /&lt;b&gt;atenção&lt;\/b&gt;/);
+});
+
+test('renderReportSummary explains the current filtered cut', () => {
+  setupDocument();
+
+  renderReportSummary({
+    totalCursistas: 10,
+    totalTurmas: 2,
+    totalEducadores: 1,
+    percentualGeralFrequencia: 70,
+    aptos: 3,
+    acompanhamento: 5,
+    naoAptos: 2,
+    percentualAptos: 30,
+    percentualNaoAptos: 20
+  });
+
+  const html = document.getElementById('reportSummary').innerHTML;
+  assert.match(html, /10 cursistas/);
+  assert.match(html, /2 turmas/);
+  assert.match(html, /70%/);
+  assert.match(html, /3 aptos/);
+  assert.match(html, /2 não aptos/);
 });
 
 test('renderLoadState updates status classes and last updated timestamp', () => {

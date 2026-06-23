@@ -16,7 +16,7 @@
     --radius-xl: 32px;
     --radius-lg: 24px;
     --radius-md: 18px;
-    --max-width: 1480px;
+    --max-width: 1680px;
 }
 
 * {
@@ -61,41 +61,41 @@ select {
 }
 
 .shape-blue {
-    width: 18rem;
-    height: 18rem;
-    top: 4rem;
-    left: -5rem;
+    width: clamp(16rem, 18vw, 24rem);
+    height: clamp(16rem, 18vw, 24rem);
+    top: 5rem;
+    left: max(-7rem, -4vw);
     background: var(--color-blue);
 }
 
 .shape-pink {
-    width: 15rem;
-    height: 15rem;
+    width: clamp(14rem, 16vw, 22rem);
+    height: clamp(14rem, 16vw, 22rem);
     top: 9rem;
-    right: -3rem;
+    right: max(-6rem, -3vw);
     background: var(--color-pink);
 }
 
 .shape-yellow {
-    width: 11rem;
-    height: 11rem;
+    width: clamp(10rem, 11vw, 16rem);
+    height: clamp(10rem, 11vw, 16rem);
     right: 14%;
     bottom: 12rem;
     background: var(--color-yellow);
 }
 
 .shape-green {
-    width: 13rem;
-    height: 13rem;
+    width: clamp(12rem, 13vw, 18rem);
+    height: clamp(12rem, 13vw, 18rem);
     left: 8%;
     bottom: -4rem;
     background: var(--color-green);
 }
 
 .site-header {
-    width: min(calc(100% - 2rem), var(--max-width));
-    margin: 1.5rem auto 0;
-    padding: clamp(1.5rem, 4vw, 3.5rem);
+    width: min(calc(100% - clamp(1rem, 2.4vw, 2rem)), var(--max-width));
+    margin: clamp(0.75rem, 1.6vw, 1.5rem) auto 0;
+    padding: clamp(1.25rem, 3vw, 3rem);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 1.5rem;
@@ -124,13 +124,13 @@ select {
 }
 
 .site-header h1 {
-    max-width: 13ch;
-    font-size: clamp(2.35rem, 6vw, 5.7rem);
+    max-width: 16ch;
+    font-size: clamp(2.35rem, 5vw, 5.35rem);
     letter-spacing: -0.06em;
 }
 
 .header-description {
-    max-width: 64rem;
+    max-width: 78rem;
     margin: 1rem 0 0;
     color: var(--color-muted);
     font-size: clamp(1rem, 2vw, 1.18rem);
@@ -153,7 +153,7 @@ select {
 
 .brand-heading {
     display: grid;
-    grid-template-columns: clamp(7rem, 14vw, 11rem) minmax(0, 1fr);
+    grid-template-columns: clamp(7rem, 10vw, 11rem) minmax(0, 1fr);
     gap: clamp(1rem, 3vw, 2rem);
     align-items: center;
 }
@@ -168,10 +168,10 @@ select {
 }
 
 .dashboard {
-    width: min(calc(100% - 2rem), var(--max-width));
-    margin: 1.25rem auto 0;
+    width: min(calc(100% - clamp(1rem, 2.4vw, 2rem)), var(--max-width));
+    margin: clamp(0.85rem, 1.5vw, 1.25rem) auto 0;
     display: grid;
-    gap: 1.25rem;
+    gap: clamp(0.85rem, 1.3vw, 1.25rem);
 }
 
 .dashboard > *,
@@ -195,7 +195,7 @@ select {
 }
 
 .filters-card {
-    padding: clamp(1rem, 2.5vw, 1.5rem);
+    padding: clamp(1rem, 1.8vw, 1.45rem);
     border-radius: var(--radius-lg);
 }
 
@@ -204,7 +204,7 @@ select {
     justify-content: space-between;
     gap: 1rem;
     align-items: center;
-    margin-bottom: 1.15rem;
+    margin-bottom: clamp(0.8rem, 1.1vw, 1.15rem);
 }
 
 .section-heading h2,
@@ -215,7 +215,7 @@ select {
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.9rem;
+    gap: clamp(0.7rem, 1vw, 0.9rem);
 }
 
 .filters-grid label {
@@ -274,12 +274,12 @@ select {
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
+    gap: clamp(0.75rem, 1vw, 1rem);
 }
 
 .kpi-card {
-    min-height: 11rem;
-    padding: 1.25rem;
+    min-height: 9.8rem;
+    padding: clamp(1rem, 1.25vw, 1.25rem);
     border-radius: var(--radius-lg);
     position: relative;
     overflow: hidden;
@@ -297,14 +297,14 @@ select {
 }
 
 .kpi-card p {
-    margin: 1rem 0 0.4rem;
+    margin: 0.85rem 0 0.35rem;
     color: var(--color-muted);
     font-weight: 800;
 }
 
 .kpi-card strong {
     font-family: "Outfit", "Inter", sans-serif;
-    font-size: clamp(2.1rem, 4vw, 3.4rem);
+    font-size: clamp(2rem, 3vw, 3.15rem);
     letter-spacing: -0.05em;
 }
 
@@ -326,7 +326,7 @@ select {
 .kpi-icon.red { background: var(--color-red); }
 
 .panel {
-    padding: clamp(1rem, 2.1vw, 1.5rem);
+    padding: clamp(1rem, 1.65vw, 1.45rem);
     border-radius: var(--radius-lg);
 }
 
@@ -369,7 +369,7 @@ select {
 }
 
 .chart-description {
-    min-height: 3.1rem;
+    min-height: 2.6rem;
     font-size: 0.95rem;
 }
 
@@ -497,17 +497,17 @@ select {
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
+    gap: clamp(0.85rem, 1.3vw, 1.25rem);
 }
 
 .chart-panel {
-    min-height: 24rem;
+    min-height: 22.5rem;
 }
 
 .chart-panel canvas {
     width: 100%;
-    max-height: 19rem;
-    margin-top: 1rem;
+    max-height: 18rem;
+    margin-top: 0.8rem;
 }
 
 .chart-panel-wide {
@@ -655,8 +655,8 @@ tbody tr:last-child td {
 }
 
 .site-footer {
-    width: min(calc(100% - 2rem), var(--max-width));
-    margin: 1.25rem auto 2rem;
+    width: min(calc(100% - clamp(1rem, 2.4vw, 2rem)), var(--max-width));
+    margin: clamp(0.85rem, 1.4vw, 1.25rem) auto 1.5rem;
     padding: 1.25rem clamp(1rem, 2.5vw, 1.5rem);
     color: var(--color-muted);
     background: rgba(255, 255, 255, 0.68);
@@ -678,6 +678,44 @@ tbody tr:last-child td {
 
 .footer-brand + p {
     margin-top: 0.35rem;
+}
+
+@media (min-width: 1500px) {
+    .filters-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .search-field {
+        grid-column: span 2;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+
+    .kpi-card {
+        min-height: 9.2rem;
+    }
+
+    .kpi-card strong {
+        font-size: clamp(1.85rem, 2vw, 2.65rem);
+    }
+
+    .report-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .charts-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .chart-panel {
+        min-height: 21.5rem;
+    }
+
+    .chart-panel-wide {
+        grid-column: span 2;
+    }
 }
 
 @media (max-width: 960px) {

@@ -2,6 +2,7 @@ import { REFRESH_INTERVAL_MS } from './config.js';
 import { fetchSheetRows } from './csv.js';
 import { applyFilters, buildAttendanceModel } from './attendanceModel.js';
 import { renderCharts } from './charts.js';
+import { bindReportDownloads } from './reports.js';
 import {
   bindFilterEvents,
   populateFilters,
@@ -14,6 +15,7 @@ import {
 } from './render.js';
 
 let baseModel = null;
+let currentFilteredModel = null;
 let isLoading = false;
 let appStarted = false;
 let refreshTimerId = null;
@@ -23,6 +25,7 @@ export function render() {
 
   populateFilters(baseModel, readFilters());
   const filteredModel = applyFilters(baseModel, readFilters());
+  currentFilteredModel = filteredModel;
   renderKpis(filteredModel.summary);
   renderReportSummary(filteredModel.summary);
   renderRiskList(filteredModel.students);
@@ -67,6 +70,10 @@ export function startApp() {
 
   appStarted = true;
   bindFilterEvents(render);
+  bindReportDownloads(() => ({
+    model: currentFilteredModel,
+    filters: readFilters()
+  }));
   loadData();
   refreshTimerId = window.setInterval(loadData, REFRESH_INTERVAL_MS);
 

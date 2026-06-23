@@ -378,6 +378,74 @@ select {
     gap: 0.75rem;
 }
 
+.risk-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.download-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    color: #0f5d7c;
+    background: rgba(51, 166, 217, 0.1);
+    border: 1px solid rgba(51, 166, 217, 0.25);
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.8rem;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.download-button:hover,
+.download-button:focus-visible {
+    background: rgba(51, 166, 217, 0.18);
+    box-shadow: 0 8px 18px rgba(47, 128, 193, 0.16);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.download-button-red {
+    color: #8f271d;
+    background: rgba(233, 75, 60, 0.1);
+    border-color: rgba(233, 75, 60, 0.25);
+}
+
+.download-button-red:hover,
+.download-button-red:focus-visible {
+    background: rgba(233, 75, 60, 0.16);
+    box-shadow: 0 8px 18px rgba(233, 75, 60, 0.15);
+}
+
+.risk-report-note,
+.download-status {
+    margin: -0.25rem 0 1rem;
+    color: var(--color-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.download-status {
+    min-height: 1.3rem;
+    margin-top: -0.55rem;
+    color: #0f5d7c;
+    font-weight: 700;
+}
+
+.download-status:empty {
+    display: none;
+}
+
+.download-status.is-error {
+    color: #8f271d;
+}
+
 .empty-state {
     margin: 0;
     padding: 1rem;
@@ -583,8 +651,14 @@ tbody tr:last-child td {
     }
 
     .reset-button,
-    .update-status {
+    .update-status,
+    .risk-actions,
+    .download-button {
         width: 100%;
+    }
+
+    .risk-actions {
+        justify-content: stretch;
     }
 
     .filters-grid,

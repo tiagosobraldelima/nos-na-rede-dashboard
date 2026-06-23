@@ -158,6 +158,17 @@ select {
     gap: 1.25rem;
 }
 
+.dashboard > *,
+.filters-card,
+.panel,
+.kpi-grid,
+.kpi-card,
+.charts-grid,
+.filters-grid,
+.risk-list {
+    min-width: 0;
+}
+
 .filters-card,
 .panel,
 .kpi-card {

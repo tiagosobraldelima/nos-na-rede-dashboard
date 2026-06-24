@@ -31,7 +31,12 @@ export function render() {
   renderReportSummary(filteredModel.summary);
   renderRiskList(filteredModel.students);
   renderStudentTable(filteredModel.students);
-  renderCharts(filteredModel);
+
+  try {
+    renderCharts(filteredModel);
+  } catch (error) {
+    console.error('Erro ao renderizar gráficos:', error);
+  }
 }
 
 export async function loadData() {

@@ -537,7 +537,7 @@ select {
     width: 100%;
     overflow-x: auto;
     border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
+    border-radius: 1.35rem;
     background: var(--color-surface-strong);
     scrollbar-color: rgba(47, 128, 193, 0.45) rgba(47, 128, 193, 0.08);
     scrollbar-width: thin;
@@ -567,7 +567,7 @@ select {
 
 .data-table th,
 .data-table td {
-    padding: 0.72rem 0.58rem;
+    padding: 0.9rem 0.72rem;
     text-align: left;
     border-bottom: 1px solid rgba(23, 32, 51, 0.08);
     vertical-align: middle;
@@ -584,6 +584,7 @@ select {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.055em;
+    white-space: nowrap;
 }
 
 .data-table th i {
@@ -598,6 +599,11 @@ select {
     line-height: 1.24;
 }
 
+.data-table td:first-child {
+    color: var(--color-ink);
+    font-weight: 900;
+}
+
 .data-table tbody tr:nth-child(even) {
     background: rgba(47, 128, 193, 0.025);
 }
@@ -608,7 +614,7 @@ select {
 
 .participant-table th:nth-child(1),
 .participant-table td:nth-child(1) {
-    width: 12%;
+    width: 13%;
 }
 
 .participant-table th:nth-child(2),
@@ -634,7 +640,7 @@ select {
 .participant-table td:nth-child(7),
 .participant-table th:nth-child(8),
 .participant-table td:nth-child(8) {
-    width: 6%;
+    width: 5%;
     text-align: center;
 }
 
@@ -646,7 +652,7 @@ select {
 
 .participant-table th:nth-child(10),
 .participant-table td:nth-child(10) {
-    width: 14%;
+    width: 12%;
 }
 
 .priority-table th:nth-child(1),
@@ -710,6 +716,7 @@ select {
     padding: 0.7rem 0.8rem;
     color: #9f2b22;
     background: rgba(233, 75, 60, 0.08);
+    border: 1px solid rgba(233, 75, 60, 0.12);
     border-radius: 0.5rem;
     font-weight: 800;
     line-height: 1.35;
@@ -719,7 +726,7 @@ select {
     margin-top: 0.1rem;
 }
 
-tbody tr:last-child td {
+.data-table tbody tr:last-child td {
     border-bottom: 0;
 }
 

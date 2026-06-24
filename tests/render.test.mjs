@@ -135,7 +135,7 @@ test('populateFilters restricts turma options to the selected educator', () => {
 
   populateFilters(model, {
     educador: 'Educadora 1',
-    turma: 'Turma C'
+    turma: 'Todos'
   });
 
   const turmaSelect = document.getElementById('filterTurma');
@@ -143,6 +143,33 @@ test('populateFilters restricts turma options to the selected educator', () => {
   assert.match(turmaSelect.innerHTML, /Turma B/);
   assert.doesNotMatch(turmaSelect.innerHTML, /Turma C/);
   assert.equal(turmaSelect.value, 'Todos');
+});
+
+test('populateFilters restricts educator options to the selected turma', () => {
+  setupDocument();
+  const model = {
+    students: [
+      { turma: 'Turma A', educador: 'Educadora 1' },
+      { turma: 'Turma B', educador: 'Educadora 1' },
+      { turma: 'Turma C', educador: 'Educadora 2' }
+    ],
+    options: {
+      turmas: ['Turma A', 'Turma B', 'Turma C'],
+      municipios: ['Maceió'],
+      educadores: ['Educadora 1', 'Educadora 2'],
+      statusInscricao: ['INSCRITO']
+    }
+  };
+
+  populateFilters(model, {
+    turma: 'Turma C',
+    educador: 'Educadora 1'
+  });
+
+  const educadorSelect = document.getElementById('filterEducador');
+  assert.match(educadorSelect.innerHTML, /Educadora 2/);
+  assert.doesNotMatch(educadorSelect.innerHTML, /Educadora 1/);
+  assert.equal(educadorSelect.value, 'Todos');
 });
 
 test('render helpers escape text and render empty states', () => {

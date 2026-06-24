@@ -62,6 +62,7 @@ function setSelectOptions(id, options, selectedValue) {
     .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
     .join('');
   select.value = selected;
+  return selected;
 }
 
 function turmasForSelectedEducador(model, selectedEducador) {
@@ -79,11 +80,30 @@ function turmasForSelectedEducador(model, selectedEducador) {
   return allTurmas.filter((turma) => linkedTurmas.has(turma));
 }
 
+function educadoresForSelectedTurma(model, selectedTurma) {
+  const allEducadores = model.options?.educadores ?? [];
+  if (!selectedTurma || selectedTurma === 'Todos') return allEducadores;
+  if (!Array.isArray(model.students) || model.students.length === 0) return allEducadores;
+
+  const linkedEducadores = new Set(
+    (model.students ?? [])
+      .filter((student) => student.turma === selectedTurma)
+      .map((student) => student.educador)
+      .filter(Boolean)
+  );
+
+  return allEducadores.filter((educador) => linkedEducadores.has(educador));
+}
+
 export function populateFilters(model, currentFilters = {}) {
-  setSelectOptions(FILTER_IDS.educador, model.options?.educadores ?? [], currentFilters.educador);
+  const selectedEducador = setSelectOptions(
+    FILTER_IDS.educador,
+    educadoresForSelectedTurma(model, currentFilters.turma),
+    currentFilters.educador
+  );
   setSelectOptions(
     FILTER_IDS.turma,
-    turmasForSelectedEducador(model, currentFilters.educador),
+    turmasForSelectedEducador(model, selectedEducador),
     currentFilters.turma
   );
   setSelectOptions(FILTER_IDS.municipio, model.options?.municipios ?? [], currentFilters.municipio);

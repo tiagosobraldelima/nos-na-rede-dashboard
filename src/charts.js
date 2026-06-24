@@ -1,6 +1,22 @@
 import { CERTIFICATION_STATUS, COLORS } from './config.js';
 
 const charts = {};
+const trendPlugin = {
+  id: 'nosNaRedeCenterLabel',
+  afterDraw(chart) {
+    const text = chart.options?.plugins?.centerLabel?.text;
+    if (!text) return;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    ctx.save();
+    ctx.fillStyle = COLORS.ink;
+    ctx.font = '700 18px Outfit, Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, (chartArea.left + chartArea.right) / 2, (chartArea.top + chartArea.bottom) / 2);
+    ctx.restore();
+  }
+};
 
 function chartLibrary() {
   return globalThis.Chart ?? globalThis.window?.Chart;
@@ -41,6 +57,53 @@ function statusDatasets(items) {
   ];
 }
 
+function trendDataset(items, selector, label = 'Tendência', axisId = 'yTrend') {
+  return {
+    type: 'line',
+    label,
+    data: items.map(selector),
+    borderColor: COLORS.blue,
+    backgroundColor: 'rgba(47, 128, 193, 0.1)',
+    borderWidth: 3,
+    pointRadius: 3,
+    pointHoverRadius: 5,
+    tension: 0.36,
+    fill: false,
+    yAxisID: axisId === 'yTrend' ? axisId : undefined,
+    xAxisID: axisId === 'xTrend' ? axisId : undefined,
+    order: 0
+  };
+}
+
+function sharedChartOptions(extraOptions = {}) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 450 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+          color: COLORS.muted,
+          font: { weight: 700 }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#172033',
+        padding: 10,
+        titleFont: { weight: 800 },
+        bodyFont: { weight: 600 }
+      },
+      ...(extraOptions.plugins ?? {})
+    },
+    scales: extraOptions.scales,
+    ...Object.fromEntries(Object.entries(extraOptions).filter(([key]) => !['plugins', 'scales'].includes(key)))
+  };
+}
+
 function renderHorizontalStatusChart(Chart, id, items) {
   const context = canvasContext(id);
   if (!context) return;
@@ -49,20 +112,40 @@ function renderHorizontalStatusChart(Chart, id, items) {
     type: 'bar',
     data: {
       labels: items.map((item) => item.nome),
-      datasets: statusDatasets(items)
+      datasets: [
+        ...statusDatasets(items).map((dataset) => ({ ...dataset, order: 1 })),
+        trendDataset(items, (item) => item.frequenciaMedia ?? 0, 'Tendência de frequência', 'xTrend')
+      ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
+    options: sharedChartOptions({
       indexAxis: 'y',
-      plugins: {
-        legend: { position: 'bottom' }
-      },
       scales: {
-        x: { stacked: true, beginAtZero: true },
-        y: { stacked: true }
+        x: { stacked: true, beginAtZero: true, grid: { color: 'rgba(23, 32, 51, 0.08)' } },
+        y: { stacked: true, ticks: { color: COLORS.muted, font: { weight: 700 } }, grid: { display: false } },
+        xTrend: {
+          position: 'top',
+          min: 0,
+          max: 100,
+          grid: { display: false },
+          ticks: { callback: (value) => `${value}%`, color: COLORS.blue }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label(context) {
+              if (context.dataset.xAxisID === 'xTrend') {
+                return `${context.dataset.label}: ${context.parsed?.x ?? 0}%`;
+              }
+              if (context.dataset.yAxisID === 'yTrend') {
+                return `${context.dataset.label}: ${context.parsed?.y ?? 0}`;
+              }
+              return `${context.dataset.label}: ${context.parsed?.x ?? context.parsed?.y ?? 0}`;
+            }
+          }
+        }
       }
-    }
+    })
   });
 }
 
@@ -74,6 +157,7 @@ export function renderCharts(model) {
     console.warn('Chart.js não está disponível; os gráficos não serão renderizados.');
     return;
   }
+  Chart.register?.(trendPlugin);
 
   const statusContext = canvasContext('statusChart');
   if (statusContext) {
@@ -96,13 +180,13 @@ export function renderCharts(model) {
           borderWidth: 2
         }]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      options: sharedChartOptions({
         plugins: {
-          legend: { position: 'bottom' }
+          centerLabel: {
+            text: `${model.summary?.totalCursistas ?? 0}`
+          }
         }
-      }
+      })
     });
   }
 
@@ -114,23 +198,25 @@ export function renderCharts(model) {
       data: {
         labels: encounters.map((item) => item.encontro),
         datasets: [
-          { label: 'Presenças', data: encounters.map((item) => item.presencas), backgroundColor: COLORS.green },
-          { label: 'Faltas', data: encounters.map((item) => item.faltas), backgroundColor: COLORS.red },
-          { label: 'Dispensas', data: encounters.map((item) => item.dispensas), backgroundColor: COLORS.yellow },
-          { label: 'Sem registro', data: encounters.map((item) => item.semRegistro), backgroundColor: COLORS.line }
+          { label: 'Presenças', data: encounters.map((item) => item.presencas), backgroundColor: COLORS.green, order: 1 },
+          { label: 'Faltas', data: encounters.map((item) => item.faltas), backgroundColor: COLORS.red, order: 1 },
+          { label: 'Dispensas', data: encounters.map((item) => item.dispensas), backgroundColor: COLORS.yellow, order: 1 },
+          { label: 'Sem registro', data: encounters.map((item) => item.semRegistro), backgroundColor: COLORS.line, order: 1 },
+          trendDataset(encounters, (item) => item.presencas, 'Linha de tendência')
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' }
-        },
+      options: sharedChartOptions({
         scales: {
-          x: { stacked: true },
-          y: { stacked: true, beginAtZero: true }
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(23, 32, 51, 0.08)' } },
+          yTrend: {
+            position: 'right',
+            beginAtZero: true,
+            grid: { display: false },
+            ticks: { color: COLORS.blue }
+          }
         }
-      }
+      })
     });
   }
 

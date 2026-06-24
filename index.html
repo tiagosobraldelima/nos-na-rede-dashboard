@@ -82,12 +82,6 @@
                         <option value="">Todos os educadores</option>
                     </select>
                 </label>
-                <label for="filterEncontro">
-                    Encontro
-                    <select id="filterEncontro">
-                        <option value="">Todos os encontros</option>
-                    </select>
-                </label>
                 <label for="filterSituacao">
                     Situação
                     <select id="filterSituacao">
@@ -99,10 +93,6 @@
                     <select id="filterStatusInscricao">
                         <option value="">Todos os status</option>
                     </select>
-                </label>
-                <label for="filterBusca" class="search-field">
-                    Busca
-                    <input id="filterBusca" type="search" placeholder="Nome, CPF, turma ou município">
                 </label>
             </div>
         </section>
@@ -170,8 +160,25 @@
                 e incluem resumo por turma.
             </p>
             <p id="riskReportStatus" class="download-status" aria-live="polite"></p>
-            <div id="riskList" class="risk-list">
-                <p class="empty-state">A lista será preenchida quando os dados forem processados.</p>
+            <div class="table-wrap priority-table-wrap">
+                <table class="data-table priority-table">
+                    <thead>
+                        <tr>
+                            <th>Nome <i class="fa-solid fa-sort"></i></th>
+                            <th>Turma <i class="fa-solid fa-sort"></i></th>
+                            <th>Município <i class="fa-solid fa-sort"></i></th>
+                            <th>Educador(a) <i class="fa-solid fa-sort"></i></th>
+                            <th>Válidos <i class="fa-solid fa-sort-up"></i></th>
+                            <th>Faltas <i class="fa-solid fa-sort"></i></th>
+                            <th>Observação <i class="fa-solid fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="riskList">
+                        <tr>
+                            <td colspan="7">A lista será preenchida quando os dados forem processados.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 
@@ -210,6 +217,10 @@
                     <h2 id="tableTitle">Participantes e presenças</h2>
                 </div>
                 <div class="table-actions" aria-label="Controles da base analítica">
+                    <label for="filterBusca" class="table-search-field">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input id="filterBusca" type="search" placeholder="Buscar por nome, CPF, turma, município ou educador">
+                    </label>
                     <label class="page-size-control" for="tablePageSize">
                         Exibir
                         <select id="tablePageSize">
@@ -241,19 +252,19 @@
             <p id="tableDisplayStatus" class="table-display-status" aria-live="polite"></p>
             <p id="tableReportStatus" class="download-status" aria-live="polite"></p>
             <div class="table-wrap">
-                <table>
+                <table class="data-table participant-table">
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Turma</th>
-                            <th>Município</th>
-                            <th>Educador(a)</th>
-                            <th>Presenças</th>
-                            <th>Faltas</th>
-                            <th>Dispensas</th>
-                            <th>Válidos</th>
-                            <th>% frequência</th>
-                            <th>Situação</th>
+                            <th>Nome <i class="fa-solid fa-sort"></i></th>
+                            <th>Turma <i class="fa-solid fa-sort"></i></th>
+                            <th>Município <i class="fa-solid fa-sort"></i></th>
+                            <th>Educador(a) <i class="fa-solid fa-sort"></i></th>
+                            <th>Presenças <i class="fa-solid fa-sort"></i></th>
+                            <th>Faltas <i class="fa-solid fa-sort"></i></th>
+                            <th>Dispensas <i class="fa-solid fa-sort"></i></th>
+                            <th>Válidos <i class="fa-solid fa-sort"></i></th>
+                            <th>% frequência <i class="fa-solid fa-sort"></i></th>
+                            <th>Situação <i class="fa-solid fa-sort"></i></th>
                         </tr>
                     </thead>
                     <tbody id="studentTable">

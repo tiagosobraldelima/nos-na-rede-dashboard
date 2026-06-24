@@ -58,7 +58,6 @@ function setupDocument() {
     'filterTurma',
     'filterMunicipio',
     'filterEducador',
-    'filterEncontro',
     'filterSituacao',
     'filterStatusInscricao',
     'filterBusca',
@@ -96,21 +95,19 @@ test('populateFilters preserves valid selections and readFilters returns the cur
     turma: 'Turma B',
     municipio: 'Cidade removida',
     educador: 'Educadora',
-    encontro: '3º encontro',
     situacao: CERTIFICATION_STATUS.naoApto,
     statusInscricao: 'INSCRITO',
     busca: 'ana'
   });
 
   assert.match(document.getElementById('filterTurma').innerHTML, /value="Todos"/);
-  assert.match(document.getElementById('filterEncontro').innerHTML, /5º encontro/);
   assert.equal(document.getElementById('filterTurma').value, 'Turma B');
   assert.equal(document.getElementById('filterMunicipio').value, 'Todos');
   assert.deepEqual(readFilters(), {
     turma: 'Turma B',
     municipio: 'Todos',
     educador: 'Educadora',
-    encontro: '3º encontro',
+    encontro: 'Todos',
     situacao: CERTIFICATION_STATUS.naoApto,
     statusInscricao: 'INSCRITO',
     busca: 'ana'
@@ -171,6 +168,20 @@ test('render helpers escape text and render empty states', () => {
 
   renderRiskList([]);
   assert.match(document.getElementById('riskList').innerHTML, /Nenhum participante/);
+
+  renderRiskList([{
+    nome: 'Maria Teste',
+    turma: 'Turma A',
+    municipio: 'Maceió',
+    educador: 'Educadora',
+    periodosValidos: 0,
+    faltas: 6,
+    situacao: CERTIFICATION_STATUS.naoApto,
+    observacao: 'Não apto: <b>atenção</b>'
+  }]);
+  assert.match(document.getElementById('riskList').innerHTML, /<tr>/);
+  assert.match(document.getElementById('riskList').innerHTML, /count-pill-red/);
+  assert.match(document.getElementById('riskList').innerHTML, /&lt;b&gt;atenção&lt;\/b&gt;/);
 
   renderStudentTable([{
     nome: '<script>bad</script>',

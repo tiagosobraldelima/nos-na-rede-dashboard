@@ -1,10 +1,9 @@
-import { CERTIFICATION_STATUS, TOTAL_ENCOUNTERS } from './config.js';
+import { CERTIFICATION_STATUS } from './config.js';
 
 const FILTER_IDS = {
   turma: 'filterTurma',
   municipio: 'filterMunicipio',
   educador: 'filterEducador',
-  encontro: 'filterEncontro',
   situacao: 'filterSituacao',
   statusInscricao: 'filterStatusInscricao',
   busca: 'filterBusca'
@@ -88,11 +87,10 @@ export function populateFilters(model, currentFilters = {}) {
   );
   setSelectOptions(FILTER_IDS.municipio, model.options?.municipios ?? [], currentFilters.municipio);
   setSelectOptions(
-    FILTER_IDS.encontro,
-    Array.from({ length: TOTAL_ENCOUNTERS }, (_, index) => `${index + 1}º encontro`),
-    currentFilters.encontro
+    FILTER_IDS.situacao,
+    Object.values(CERTIFICATION_STATUS),
+    currentFilters.situacao
   );
-  setSelectOptions(FILTER_IDS.situacao, Object.values(CERTIFICATION_STATUS), currentFilters.situacao);
   setSelectOptions(
     FILTER_IDS.statusInscricao,
     model.options?.statusInscricao ?? [],
@@ -181,23 +179,23 @@ export function renderRiskList(students = []) {
       (a.periodosValidos - b.periodosValidos)
       || (b.faltas - a.faltas)
       || String(a.nome).localeCompare(String(b.nome))
-    ))
-    .slice(0, 12);
+    ));
 
   if (riskStudents.length === 0) {
-    target.innerHTML = '<p class="empty-state">Nenhum participante em risco nos filtros atuais.</p>';
+    target.innerHTML = '<tr><td colspan="7">Nenhum participante em risco nos filtros atuais.</td></tr>';
     return;
   }
 
   target.innerHTML = riskStudents.map((student) => `
-    <article class="risk-item">
-      <div>
-        <strong>${escapeHtml(student.nome)}</strong>
-        <p>${escapeHtml(student.turma)} • ${escapeHtml(student.municipio)} • ${escapeHtml(student.educador)}</p>
-        <small>${escapeHtml(student.observacao)}</small>
-      </div>
-      <span class="badge badge-red">${formatNumber(student.periodosValidos)} válidos / ${formatNumber(student.faltas)} faltas</span>
-    </article>
+    <tr>
+      <td><strong>${escapeHtml(student.nome)}</strong></td>
+      <td>${escapeHtml(student.turma)}</td>
+      <td>${escapeHtml(student.municipio)}</td>
+      <td>${escapeHtml(student.educador)}</td>
+      <td class="numeric-cell">${formatNumber(student.periodosValidos)}</td>
+      <td class="numeric-cell"><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
+      <td><span class="observation-alert"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(student.observacao)}</span></td>
+    </tr>
   `).join('');
 }
 
@@ -284,7 +282,7 @@ export function readFilters() {
     turma: element(FILTER_IDS.turma)?.value || 'Todos',
     municipio: element(FILTER_IDS.municipio)?.value || 'Todos',
     educador: element(FILTER_IDS.educador)?.value || 'Todos',
-    encontro: element(FILTER_IDS.encontro)?.value || 'Todos',
+    encontro: 'Todos',
     situacao: element(FILTER_IDS.situacao)?.value || 'Todos',
     statusInscricao: element(FILTER_IDS.statusInscricao)?.value || 'Todos',
     busca: element(FILTER_IDS.busca)?.value || ''

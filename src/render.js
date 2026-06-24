@@ -268,7 +268,7 @@ export function renderStudentTable(students = [], pageSize = readTablePageSize()
       <td>${formatNumber(student.dispensas)}</td>
       <td>${formatNumber(student.periodosValidos)}</td>
       <td>${formatPercent(student.percentualFrequencia)}</td>
-      <td><span class="status-badge ${statusClass(student.situacao)}">${escapeHtml(student.situacao)}</span></td>
+      <td><span class="status-badge ${statusClass(student.situacao)}"><i class="fa-solid ${statusIcon(student.situacao)}"></i>${escapeHtml(student.situacao)}</span></td>
     </tr>
   `).join('');
 
@@ -282,6 +282,12 @@ function statusClass(situacao) {
   if (situacao === CERTIFICATION_STATUS.apto) return 'status-ok';
   if (situacao === CERTIFICATION_STATUS.naoApto) return 'status-danger';
   return 'status-watch';
+}
+
+function statusIcon(situacao) {
+  if (situacao === CERTIFICATION_STATUS.apto) return 'fa-circle-check';
+  if (situacao === CERTIFICATION_STATUS.naoApto) return 'fa-triangle-exclamation';
+  return 'fa-clock';
 }
 
 export function renderLoadState({ status, message, updatedAt } = {}) {

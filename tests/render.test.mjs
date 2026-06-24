@@ -9,6 +9,7 @@ import {
   renderReportSummary,
   renderRiskList,
   renderStudentTable,
+  readRiskPageSize,
   readTablePageSize
 } from '../src/render.js';
 
@@ -64,6 +65,8 @@ function setupDocument() {
     'kpiGrid',
     'reportSummary',
     'riskList',
+    'riskDisplayStatus',
+    'riskPageSize',
     'studentTable',
     'tableDisplayStatus',
     'tablePageSize',
@@ -228,6 +231,33 @@ test('renderStudentTable respects the selected row limit without changing the fi
   assert.equal(readTablePageSize(), 'all');
   renderStudentTable(students);
   assert.equal((document.getElementById('studentTable').innerHTML.match(/<tr>/g) ?? []).length, 12);
+});
+
+test('renderRiskList respects the selected row limit without changing the filtered total', () => {
+  const elements = setupDocument();
+  elements.get('riskPageSize').value = '10';
+  const students = Array.from({ length: 12 }, (_, index) => ({
+    nome: `Cursista ${String(index + 1).padStart(2, '0')}`,
+    turma: 'Turma A',
+    municipio: 'Maceió',
+    educador: 'Educadora',
+    periodosValidos: index,
+    faltas: 12 - index,
+    situacao: CERTIFICATION_STATUS.naoApto,
+    observacao: 'Não apto: não consegue mais atingir 7 períodos válidos.'
+  }));
+
+  assert.equal(readRiskPageSize(), 10);
+  renderRiskList(students);
+
+  const html = document.getElementById('riskList').innerHTML;
+  assert.equal((html.match(/<tr>/g) ?? []).length, 10);
+  assert.match(document.getElementById('riskDisplayStatus').textContent, /Exibindo 10 de 12/);
+
+  elements.get('riskPageSize').value = 'all';
+  assert.equal(readRiskPageSize(), 'all');
+  renderRiskList(students);
+  assert.equal((document.getElementById('riskList').innerHTML.match(/<tr>/g) ?? []).length, 12);
 });
 
 test('renderReportSummary explains the current filtered cut', () => {

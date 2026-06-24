@@ -10,6 +10,7 @@ const FILTER_IDS = {
 };
 
 const TABLE_PAGE_SIZE_ID = 'tablePageSize';
+const RISK_PAGE_SIZE_ID = 'riskPageSize';
 
 function element(id) {
   return document.getElementById(id);
@@ -106,22 +107,22 @@ export function renderKpis(summary = {}) {
   if (!target) return;
 
   const cards = [
-    ['Cursistas', summary.totalCursistas, 'fa-users', 'blue'],
-    ['Turmas', summary.totalTurmas, 'fa-people-group', 'cyan'],
-    ['Municípios', summary.totalMunicipios, 'fa-location-dot', 'pink'],
-    ['Educadores', summary.totalEducadores, 'fa-chalkboard-user', 'yellow'],
-    ['Períodos por cursista', summary.periodosPorCursista, 'fa-list-check', 'blue'],
-    ['Períodos previstos total', summary.periodosPrevistosTotal, 'fa-calendar-days', 'cyan'],
-    ['Presenças', summary.presencas, 'fa-circle-check', 'green'],
-    ['Faltas', summary.faltas, 'fa-circle-xmark', 'red'],
-    ['Dispensas', summary.dispensas, 'fa-notes-medical', 'yellow'],
-    ['Frequência geral', formatPercent(summary.percentualGeralFrequencia), 'fa-chart-line', 'green'],
-    ['Aptos', summary.aptos, 'fa-certificate', 'green'],
-    ['Em acompanhamento', summary.acompanhamento, 'fa-clock', 'yellow'],
+    ['Cursistas', summary.totalCursistas, 'fa-user-graduate', 'blue'],
+    ['Turmas', summary.totalTurmas, 'fa-layer-group', 'cyan'],
+    ['Municípios', summary.totalMunicipios, 'fa-map-location-dot', 'pink'],
+    ['Educadores', summary.totalEducadores, 'fa-person-chalkboard', 'yellow'],
+    ['Períodos por cursista', summary.periodosPorCursista, 'fa-clipboard-list', 'blue'],
+    ['Períodos previstos total', summary.periodosPrevistosTotal, 'fa-calendar-check', 'cyan'],
+    ['Presenças', summary.presencas, 'fa-user-check', 'green'],
+    ['Faltas', summary.faltas, 'fa-user-xmark', 'red'],
+    ['Dispensas', summary.dispensas, 'fa-hand-holding-heart', 'yellow'],
+    ['Frequência geral', formatPercent(summary.percentualGeralFrequencia), 'fa-chart-simple', 'green'],
+    ['Aptos', summary.aptos, 'fa-award', 'green'],
+    ['Em acompanhamento', summary.acompanhamento, 'fa-hourglass-half', 'yellow'],
     ['Não aptos', summary.naoAptos, 'fa-triangle-exclamation', 'red'],
-    ['Percentual aptos', formatPercent(summary.percentualAptos), 'fa-percent', 'green'],
-    ['Percentual em acompanhamento', formatPercent(summary.percentualAcompanhamento), 'fa-percent', 'yellow'],
-    ['Percentual não aptos', formatPercent(summary.percentualNaoAptos), 'fa-percent', 'red']
+    ['Percentual aptos', formatPercent(summary.percentualAptos), 'fa-circle-half-stroke', 'green'],
+    ['Percentual em acompanhamento', formatPercent(summary.percentualAcompanhamento), 'fa-gauge-high', 'yellow'],
+    ['Percentual não aptos', formatPercent(summary.percentualNaoAptos), 'fa-gauge-simple-high', 'red']
   ];
 
   target.innerHTML = cards.map(([label, value, icon, color]) => `
@@ -166,7 +167,18 @@ export function renderReportSummary(summary = {}) {
   `;
 }
 
-export function renderRiskList(students = []) {
+function readPageSize(id) {
+  const value = element(id)?.value ?? '10';
+  if (value === 'all') return 'all';
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
+}
+
+export function readRiskPageSize() {
+  return readPageSize(RISK_PAGE_SIZE_ID);
+}
+
+export function renderRiskList(students = [], pageSize = readRiskPageSize()) {
   const target = element('riskList');
   if (!target) return;
 
@@ -183,10 +195,18 @@ export function renderRiskList(students = []) {
 
   if (riskStudents.length === 0) {
     target.innerHTML = '<tr><td colspan="7">Nenhum participante em risco nos filtros atuais.</td></tr>';
+    const riskStatus = element('riskDisplayStatus');
+    if (riskStatus) {
+      riskStatus.textContent = 'Exibindo 0 de 0 participantes em atenção prioritária no recorte atual.';
+    }
     return;
   }
 
-  target.innerHTML = riskStudents.map((student) => `
+  const visibleRiskStudents = pageSize === 'all'
+    ? riskStudents
+    : riskStudents.slice(0, pageSize);
+
+  target.innerHTML = visibleRiskStudents.map((student) => `
     <tr>
       <td><strong>${escapeHtml(student.nome)}</strong></td>
       <td>${escapeHtml(student.turma)}</td>
@@ -197,13 +217,15 @@ export function renderRiskList(students = []) {
       <td><span class="observation-alert"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(student.observacao)}</span></td>
     </tr>
   `).join('');
+
+  const riskStatus = element('riskDisplayStatus');
+  if (riskStatus) {
+    riskStatus.textContent = `Exibindo ${formatNumber(visibleRiskStudents.length)} de ${formatNumber(riskStudents.length)} participantes em atenção prioritária no recorte atual.`;
+  }
 }
 
 export function readTablePageSize() {
-  const value = element(TABLE_PAGE_SIZE_ID)?.value ?? '10';
-  if (value === 'all') return 'all';
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10;
+  return readPageSize(TABLE_PAGE_SIZE_ID);
 }
 
 export function renderStudentTable(students = [], pageSize = readTablePageSize()) {
@@ -311,5 +333,10 @@ export function bindFilterEvents(callback) {
   const tablePageSize = element(TABLE_PAGE_SIZE_ID);
   if (tablePageSize) {
     tablePageSize.addEventListener('change', callback);
+  }
+
+  const riskPageSize = element(RISK_PAGE_SIZE_ID);
+  if (riskPageSize) {
+    riskPageSize.addEventListener('change', callback);
   }
 }

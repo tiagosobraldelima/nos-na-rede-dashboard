@@ -192,6 +192,22 @@ select {
     border: 1px solid rgba(255, 255, 255, 0.78);
     box-shadow: var(--shadow-card);
     backdrop-filter: blur(16px);
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .filters-card:hover,
+    .panel:hover,
+    .kpi-card:hover,
+    .report-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(51, 166, 217, 0.26);
+        box-shadow: 0 22px 52px rgba(23, 32, 51, 0.12);
+    }
 }
 
 .filters-card {
@@ -281,6 +297,12 @@ select {
     overflow: hidden;
 }
 
+@media (hover: hover) and (pointer: fine) {
+    .kpi-card:hover .kpi-icon {
+        transform: translateY(-1px) scale(1.04);
+    }
+}
+
 .kpi-card::after {
     content: "";
     position: absolute;
@@ -312,14 +334,16 @@ select {
     color: #ffffff;
     border-radius: 18px;
     font-size: 1.2rem;
+    box-shadow: 0 12px 22px rgba(23, 32, 51, 0.1);
+    transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
-.kpi-icon.blue { background: var(--color-blue); }
-.kpi-icon.cyan { background: var(--color-cyan); }
-.kpi-icon.pink { background: var(--color-pink); }
-.kpi-icon.green { background: var(--color-green); }
-.kpi-icon.yellow { background: var(--color-yellow); color: #553f00; }
-.kpi-icon.red { background: var(--color-red); }
+.kpi-icon.blue { background: linear-gradient(135deg, var(--color-blue), #46a7e1); }
+.kpi-icon.cyan { background: linear-gradient(135deg, var(--color-cyan), #56c8e9); }
+.kpi-icon.pink { background: linear-gradient(135deg, var(--color-pink), #ff79b7); }
+.kpi-icon.green { background: linear-gradient(135deg, var(--color-green), #9dd65d); }
+.kpi-icon.yellow { background: linear-gradient(135deg, var(--color-yellow), #ffd96c); color: #553f00; }
+.kpi-icon.red { background: linear-gradient(135deg, var(--color-red), #ff6b5e); }
 
 .panel {
     padding: clamp(1rem, 1.65vw, 1.45rem);
@@ -338,6 +362,7 @@ select {
     background: rgba(255, 255, 255, 0.74);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
 .report-label {
@@ -415,24 +440,27 @@ select {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    min-height: 2rem;
-    padding: 0 0.45rem 0 0.75rem;
+    min-height: 2.25rem;
+    padding: 0 0.5rem 0 0.85rem;
     color: #0f5d7c;
     background: rgba(51, 166, 217, 0.1);
     border: 1px solid rgba(51, 166, 217, 0.25);
     border-radius: 999px;
     font-weight: 800;
     font-size: 0.8rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.56);
 }
 
 .page-size-control select {
-    min-height: 1.55rem;
+    min-height: 1.75rem;
+    padding: 0 1.8rem 0 0.7rem;
     color: var(--color-ink);
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(51, 166, 217, 0.22);
     border-radius: 999px;
     font-weight: 800;
     outline: none;
+    cursor: pointer;
 }
 
 .download-button {

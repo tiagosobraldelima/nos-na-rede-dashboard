@@ -139,7 +139,17 @@
                     <p class="eyebrow">Atenção prioritária</p>
                     <h2 id="riskTitle">Participantes em risco de não certificação</h2>
                 </div>
-                <div class="risk-actions" aria-label="Downloads do relatório de atenção prioritária">
+                <div class="risk-actions" aria-label="Controles e downloads do relatório de atenção prioritária">
+                    <label class="page-size-control" for="riskPageSize">
+                        Exibir
+                        <select id="riskPageSize">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">Todos</option>
+                        </select>
+                    </label>
                     <span class="badge badge-red">Critério presencial</span>
                     <button type="button" id="downloadRiskPdf" class="download-button download-button-red">
                         <i class="fa-solid fa-file-pdf"></i>
@@ -159,6 +169,7 @@
                 Os downloads consideram todos os cursistas em atenção prioritária no recorte filtrado atual
                 e incluem resumo por turma.
             </p>
+            <p id="riskDisplayStatus" class="table-display-status" aria-live="polite"></p>
             <p id="riskReportStatus" class="download-status" aria-live="polite"></p>
             <div class="table-wrap priority-table-wrap">
                 <table class="data-table priority-table">

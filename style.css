@@ -963,13 +963,15 @@ select {
     .site-header,
     .dashboard,
     .site-footer {
-        width: min(calc(100% - 1rem), var(--max-width));
+        width: min(calc(100% - 0.75rem), var(--max-width));
     }
 
     .site-header {
         margin-top: 0.5rem;
+        padding: 1rem;
         grid-template-columns: 1fr;
-        border-radius: 24px;
+        gap: 1rem;
+        border-radius: 22px;
     }
 
     .brand-heading {
@@ -978,11 +980,30 @@ select {
     }
 
     .project-logo {
-        max-width: 8rem;
+        max-width: 6.8rem;
     }
 
     .site-header h1 {
-        max-width: 10ch;
+        max-width: 13ch;
+        font-size: clamp(2rem, 12vw, 3.1rem);
+        letter-spacing: -0.055em;
+    }
+
+    .header-description {
+        margin-top: 0.75rem;
+        font-size: 0.96rem;
+        line-height: 1.55;
+    }
+
+    .filters-card,
+    .panel {
+        padding: 1rem;
+        border-radius: 22px;
+    }
+
+    .section-heading h2,
+    .panel h2 {
+        font-size: clamp(1.35rem, 7vw, 1.85rem);
     }
 
     .section-heading {
@@ -1000,6 +1021,12 @@ select {
         width: 100%;
     }
 
+    .update-status {
+        justify-content: flex-start;
+        border-radius: 18px;
+        font-size: 0.84rem;
+    }
+
     .risk-actions,
     .table-actions {
         justify-content: stretch;
@@ -1010,10 +1037,14 @@ select {
     }
 
     .filters-grid,
-    .kpi-grid,
     .charts-grid,
     .report-summary {
         grid-template-columns: 1fr;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7rem;
     }
 
     .chart-panel-wide {
@@ -1025,23 +1056,184 @@ select {
     }
 
     .kpi-card {
-        min-height: 9rem;
+        min-height: 7.5rem;
+        padding: 0.85rem;
+        border-radius: 20px;
+    }
+
+    .kpi-card p {
+        margin-top: 0.65rem;
+        font-size: 0.86rem;
+        line-height: 1.15;
+    }
+
+    .kpi-card strong {
+        font-size: clamp(1.65rem, 9vw, 2.35rem);
+    }
+
+    .kpi-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 15px;
+        font-size: 1rem;
     }
 
     .chart-panel {
-        min-height: 20rem;
+        min-height: 18rem;
     }
 
     .chart-panel canvas {
-        max-height: 15rem;
+        max-height: 13.5rem;
+        margin-top: 0.55rem;
     }
 
-    table {
-        min-width: 1050px;
+    .chart-description {
+        min-height: auto;
+        font-size: 0.9rem;
     }
 
-    th,
-    td {
-        padding: 0.72rem 0.65rem;
+    .risk-actions,
+    .table-actions {
+        gap: 0.45rem;
+    }
+
+    .page-size-control,
+    .download-button,
+    .badge,
+    .table-search-field {
+        min-height: 2.55rem;
+    }
+
+    .table-wrap {
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .data-table,
+    .data-table thead,
+    .data-table tbody,
+    .data-table tr,
+    .data-table th,
+    .data-table td {
+        display: block;
+        width: 100% !important;
+    }
+
+    .data-table {
+        min-width: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .data-table thead {
+        position: absolute;
+        width: 1px !important;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .data-table tbody {
+        display: grid;
+        gap: 0.85rem;
+    }
+
+    .data-table tbody tr {
+        display: grid;
+        gap: 0;
+        min-height: 0;
+        padding: 0.85rem;
+        background: rgba(255, 255, 255, 0.92) !important;
+        border: 1px solid rgba(47, 128, 193, 0.14);
+        border-radius: 18px;
+        box-shadow: 0 10px 24px rgba(23, 32, 51, 0.06);
+    }
+
+    .data-table td {
+        height: auto;
+        display: grid;
+        grid-template-columns: minmax(6.8rem, 38%) minmax(0, 1fr);
+        gap: 0.65rem;
+        align-items: center;
+        padding: 0.62rem 0;
+        border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+        text-align: right;
+        font-size: 0.9rem;
+    }
+
+    .data-table td::before {
+        content: attr(data-label);
+        color: #26334d;
+        font-family: "Outfit", "Inter", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.055em;
+        text-align: left;
+        text-transform: uppercase;
+    }
+
+    .data-table td:first-child {
+        display: block;
+        padding-top: 0;
+        color: var(--color-ink);
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .data-table td:first-child::before {
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+
+    .data-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .numeric-cell,
+    .participant-table td:nth-child(5),
+    .participant-table td:nth-child(6),
+    .participant-table td:nth-child(7),
+    .participant-table td:nth-child(8),
+    .participant-table td:nth-child(9) {
+        text-align: right;
+    }
+
+    .observation-alert,
+    .participant-status-badge {
+        width: 100%;
+        text-align: left;
+    }
+
+    .participant-status-badge {
+        min-height: auto;
+    }
+
+    .site-footer {
+        border-radius: 22px;
+        font-size: 0.92rem;
+    }
+}
+
+@media (max-width: 430px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .data-table td {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+        text-align: left;
+    }
+
+    .numeric-cell,
+    .participant-table td:nth-child(5),
+    .participant-table td:nth-child(6),
+    .participant-table td:nth-child(7),
+    .participant-table td:nth-child(8),
+    .participant-table td:nth-child(9) {
+        text-align: left;
     }
 }

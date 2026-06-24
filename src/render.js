@@ -228,13 +228,13 @@ export function renderRiskList(students = [], pageSize = readRiskPageSize()) {
 
   target.innerHTML = visibleRiskStudents.map((student) => `
     <tr>
-      <td><strong>${escapeHtml(student.nome)}</strong></td>
-      <td>${escapeHtml(student.turma)}</td>
-      <td>${escapeHtml(student.municipio)}</td>
-      <td>${escapeHtml(student.educador)}</td>
-      <td class="numeric-cell">${formatNumber(student.periodosValidos)}</td>
-      <td class="numeric-cell"><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
-      <td><span class="observation-alert"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(student.observacao)}</span></td>
+      <td data-label="Nome"><strong>${escapeHtml(student.nome)}</strong></td>
+      <td data-label="Turma">${escapeHtml(student.turma)}</td>
+      <td data-label="Município">${escapeHtml(student.municipio)}</td>
+      <td data-label="Educador(a)">${escapeHtml(student.educador)}</td>
+      <td data-label="Válidos" class="numeric-cell">${formatNumber(student.periodosValidos)}</td>
+      <td data-label="Faltas" class="numeric-cell"><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
+      <td data-label="Observação"><span class="observation-alert"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(student.observacao)}</span></td>
     </tr>
   `).join('');
 
@@ -279,16 +279,16 @@ export function renderStudentTable(students = [], pageSize = readTablePageSize()
 
   target.innerHTML = visibleStudents.map((student) => `
     <tr>
-      <td>${escapeHtml(student.nome)}</td>
-      <td>${escapeHtml(student.turma)}</td>
-      <td>${escapeHtml(student.municipio)}</td>
-      <td>${escapeHtml(student.educador)}</td>
-      <td>${formatNumber(student.presencas)}</td>
-      <td><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
-      <td>${formatNumber(student.dispensas)}</td>
-      <td>${formatNumber(student.periodosValidos)}</td>
-      <td>${formatPercent(student.percentualFrequencia)}</td>
-      <td><span class="status-badge participant-status-badge ${statusClass(student.situacao)}"><i class="fa-solid ${statusIcon(student.situacao)}"></i>${escapeHtml(statusText(student))}</span></td>
+      <td data-label="Nome">${escapeHtml(student.nome)}</td>
+      <td data-label="Turma">${escapeHtml(student.turma)}</td>
+      <td data-label="Município">${escapeHtml(student.municipio)}</td>
+      <td data-label="Educador(a)">${escapeHtml(student.educador)}</td>
+      <td data-label="Presenças">${formatNumber(student.presencas)}</td>
+      <td data-label="Faltas"><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
+      <td data-label="Dispensas">${formatNumber(student.dispensas)}</td>
+      <td data-label="Válidos">${formatNumber(student.periodosValidos)}</td>
+      <td data-label="% frequência">${formatPercent(student.percentualFrequencia)}</td>
+      <td data-label="Situação"><span class="status-badge participant-status-badge ${statusClass(student.situacao)}"><i class="fa-solid ${statusIcon(student.situacao)}"></i>${escapeHtml(statusText(student))}</span></td>
     </tr>
   `).join('');
 

@@ -264,11 +264,11 @@ export function renderStudentTable(students = [], pageSize = readTablePageSize()
       <td>${escapeHtml(student.municipio)}</td>
       <td>${escapeHtml(student.educador)}</td>
       <td>${formatNumber(student.presencas)}</td>
-      <td>${formatNumber(student.faltas)}</td>
+      <td><span class="count-pill count-pill-red">${formatNumber(student.faltas)}</span></td>
       <td>${formatNumber(student.dispensas)}</td>
       <td>${formatNumber(student.periodosValidos)}</td>
       <td>${formatPercent(student.percentualFrequencia)}</td>
-      <td><span class="status-badge ${statusClass(student.situacao)}"><i class="fa-solid ${statusIcon(student.situacao)}"></i>${escapeHtml(student.situacao)}</span></td>
+      <td><span class="status-badge participant-status-badge ${statusClass(student.situacao)}"><i class="fa-solid ${statusIcon(student.situacao)}"></i>${escapeHtml(statusText(student))}</span></td>
     </tr>
   `).join('');
 
@@ -288,6 +288,13 @@ function statusIcon(situacao) {
   if (situacao === CERTIFICATION_STATUS.apto) return 'fa-circle-check';
   if (situacao === CERTIFICATION_STATUS.naoApto) return 'fa-triangle-exclamation';
   return 'fa-clock';
+}
+
+function statusText(student) {
+  if (student.situacao === CERTIFICATION_STATUS.naoApto && student.observacao) {
+    return student.observacao;
+  }
+  return student.situacao;
 }
 
 export function renderLoadState({ status, message, updatedAt } = {}) {

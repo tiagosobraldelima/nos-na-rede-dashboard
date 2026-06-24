@@ -662,12 +662,12 @@ select {
 
 .participant-table th:nth-child(1),
 .participant-table td:nth-child(1) {
-    width: 13%;
+    width: 12%;
 }
 
 .participant-table th:nth-child(2),
 .participant-table td:nth-child(2) {
-    width: 16%;
+    width: 14%;
 }
 
 .participant-table th:nth-child(3),
@@ -677,7 +677,7 @@ select {
 
 .participant-table th:nth-child(4),
 .participant-table td:nth-child(4) {
-    width: 15%;
+    width: 13%;
 }
 
 .participant-table th:nth-child(5),
@@ -700,7 +700,7 @@ select {
 
 .participant-table th:nth-child(10),
 .participant-table td:nth-child(10) {
-    width: 12%;
+    width: 24%;
     text-align: left;
 }
 
@@ -745,12 +745,13 @@ select {
 
 .count-pill {
     display: inline-flex;
-    min-width: 1.85rem;
-    min-height: 1.85rem;
+    min-width: 1.9rem;
+    min-height: 1.9rem;
     align-items: center;
     justify-content: center;
     border-radius: 0.5rem;
     font-weight: 900;
+    line-height: 1;
 }
 
 .count-pill-red {
@@ -815,6 +816,23 @@ select {
     flex: 0 0 auto;
 }
 
+.participant-status-badge {
+    width: 100%;
+    min-height: 3.2rem;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.72rem 0.85rem;
+    border-radius: 0.72rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.participant-status-badge i {
+    margin-top: 0.12rem;
+    font-size: 0.9rem;
+}
+
 .status-ok {
     color: #315f16;
     background: rgba(120, 189, 67, 0.16);
@@ -830,7 +848,7 @@ select {
 .status-danger {
     color: #9f2b22;
     background: rgba(233, 75, 60, 0.08);
-    border: 1px solid rgba(233, 75, 60, 0.16);
+    border: 1px solid rgba(233, 75, 60, 0.22);
 }
 
 .site-footer {

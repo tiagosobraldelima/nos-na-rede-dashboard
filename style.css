@@ -209,7 +209,8 @@ select {
     .filters-card:hover,
     .panel:hover,
     .kpi-card:hover,
-    .report-card:hover {
+    .report-card:hover,
+    .profile-card:hover {
         transform: translateY(-3px);
         border-color: rgba(51, 166, 217, 0.26);
         box-shadow: 0 22px 52px rgba(23, 32, 51, 0.12);
@@ -412,6 +413,88 @@ select {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.9rem;
+}
+
+.profile-panel {
+    overflow: hidden;
+}
+
+.profile-note {
+    max-width: 76rem;
+    margin: -0.25rem 0 1rem;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.profile-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 0.95rem;
+}
+
+.profile-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: center;
+    min-width: 0;
+    padding: 0.95rem;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.profile-card strong {
+    display: block;
+    font-family: "Outfit", "Inter", sans-serif;
+    font-size: clamp(1.45rem, 2.6vw, 2rem);
+    letter-spacing: -0.04em;
+}
+
+.profile-card p {
+    margin: 0.1rem 0 0;
+    color: var(--color-ink);
+    font-weight: 900;
+}
+
+.profile-card small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--color-muted);
+    line-height: 1.35;
+}
+
+.profile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.65rem;
+    height: 2.65rem;
+    border-radius: 16px;
+    font-size: 1rem;
+}
+
+.profile-icon.blue,
+.profile-icon.cyan {
+    color: #0f5d7c;
+    background: rgba(51, 166, 217, 0.14);
+}
+
+.profile-icon.yellow {
+    color: #7a5a00;
+    background: rgba(242, 207, 67, 0.22);
+}
+
+.profile-icon.pink {
+    color: #a2205f;
+    background: rgba(237, 79, 154, 0.14);
+}
+
+.badge-privacy {
+    gap: 0.45rem;
 }
 
 .report-card {
@@ -766,6 +849,43 @@ select {
 .participant-table td:nth-child(10) {
     width: 24%;
     text-align: left;
+}
+
+.profile-table th:nth-child(1),
+.profile-table td:nth-child(1) {
+    width: 15%;
+}
+
+.profile-table th:nth-child(2),
+.profile-table td:nth-child(2) {
+    width: 21%;
+}
+
+.profile-table th:nth-child(3),
+.profile-table td:nth-child(3),
+.profile-table th:nth-child(4),
+.profile-table td:nth-child(4),
+.profile-table th:nth-child(5),
+.profile-table td:nth-child(5) {
+    width: 9%;
+    text-align: center;
+}
+
+.profile-table th:nth-child(6),
+.profile-table td:nth-child(6),
+.profile-table th:nth-child(7),
+.profile-table td:nth-child(7),
+.profile-table th:nth-child(8),
+.profile-table td:nth-child(8) {
+    width: 12%;
+    text-align: center;
+}
+
+.muted-inline {
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .priority-table th:nth-child(1),
@@ -1124,7 +1244,8 @@ select {
 
     .filters-grid,
     .charts-grid,
-    .report-summary {
+    .report-summary,
+    .profile-summary {
         grid-template-columns: 1fr;
     }
 

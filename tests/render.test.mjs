@@ -6,6 +6,7 @@ import {
   readFilters,
   renderKpis,
   renderLoadState,
+  renderProfileAnalytics,
   renderReportSummary,
   renderRiskList,
   renderStudentTable,
@@ -64,6 +65,9 @@ function setupDocument() {
     'filterBusca',
     'kpiGrid',
     'reportSummary',
+    'profileSummary',
+    'profileStatus',
+    'profileTable',
     'riskList',
     'riskDisplayStatus',
     'riskPageSize',
@@ -308,6 +312,58 @@ test('renderReportSummary explains the current filtered cut', () => {
   assert.match(html, /70%/);
   assert.match(html, /3 aptos/);
   assert.match(html, /2 não aptos/);
+});
+
+test('renderProfileAnalytics renders aggregate-only cards and rows', () => {
+  setupDocument();
+
+  renderProfileAnalytics({
+    available: true,
+    minGroupSize: 5,
+    smallGroupsCollapsed: 2,
+    coverage: {
+      totalAttendance: 10,
+      totalProfiles: 12,
+      matched: 8,
+      unmatchedAttendance: 2,
+      profileOnly: 4,
+      percentMatched: 80
+    },
+    rows: [{
+      dimension: 'Raça/etnia',
+      group: 'Parda',
+      total: 8,
+      frequenciaMedia: 70,
+      faltasMedia: 3.2,
+      aptosCertificacao: 6,
+      percentualAptosCertificacao: 75,
+      criticos: 2,
+      percentualCriticos: 25,
+      naoAptos: 1,
+      percentualNaoAptos: 12.5
+    }]
+  });
+
+  assert.match(document.getElementById('profileSummary').innerHTML, /Perfis vinculados/);
+  assert.match(document.getElementById('profileSummary').innerHTML, /80%/);
+  assert.match(document.getElementById('profileTable').innerHTML, /Raça\/etnia/);
+  assert.match(document.getElementById('profileTable').innerHTML, /Parda/);
+  assert.match(document.getElementById('profileStatus').textContent, /menos de 5/);
+});
+
+test('renderProfileAnalytics keeps dashboard usable when complementary data fails', () => {
+  setupDocument();
+
+  renderProfileAnalytics({
+    available: false,
+    minGroupSize: 5,
+    coverage: {},
+    rows: []
+  }, 'Dados complementares indisponíveis no momento.');
+
+  assert.match(document.getElementById('profileStatus').textContent, /indisponíveis/);
+  assert.equal(document.getElementById('profileStatus').classList.contains('is-error'), true);
+  assert.match(document.getElementById('profileTable').innerHTML, /planilha complementar/);
 });
 
 test('renderLoadState updates status classes and last updated timestamp', () => {

@@ -133,6 +133,48 @@
             </div>
         </section>
 
+        <section class="panel profile-panel" aria-labelledby="profileTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Perfil agregado</p>
+                    <h2 id="profileTitle">Análise complementar dos cursistas</h2>
+                </div>
+                <span class="badge badge-privacy">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    Privacidade aplicada
+                </span>
+            </div>
+            <p class="profile-note">
+                A análise cruza a base principal de presença com a planilha complementar pública e exibe apenas
+                recortes agregados. Dados sensíveis e identificadores individuais não são exibidos.
+            </p>
+            <div id="profileSummary" class="profile-summary">
+                <p class="empty-state">A análise de perfil será gerada após o carregamento dos dados.</p>
+            </div>
+            <p id="profileStatus" class="download-status" aria-live="polite"></p>
+            <div class="table-wrap profile-table-wrap">
+                <table class="data-table profile-table">
+                    <thead>
+                        <tr>
+                            <th>Recorte <i class="fa-solid fa-sort"></i></th>
+                            <th>Grupo <i class="fa-solid fa-sort"></i></th>
+                            <th>Cursistas <i class="fa-solid fa-sort"></i></th>
+                            <th>Freq. média <i class="fa-solid fa-sort"></i></th>
+                            <th>Faltas méd. <i class="fa-solid fa-sort"></i></th>
+                            <th>Aptos 0–3 faltas <i class="fa-solid fa-sort"></i></th>
+                            <th>Críticos 2–3 faltas <i class="fa-solid fa-sort"></i></th>
+                            <th>Sem possibilidade <i class="fa-solid fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="profileTable">
+                        <tr>
+                            <td colspan="8">Os recortes agregados serão exibidos aqui.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="panel risk-panel" aria-labelledby="riskTitle">
             <div class="section-heading">
                 <div>

@@ -208,6 +208,69 @@ export function renderReportSummary(summary = {}) {
   `;
 }
 
+export function renderProfileAnalytics(profileAnalytics = {}, loadIssue = '') {
+  const summaryTarget = element('profileSummary');
+  const tableTarget = element('profileTable');
+  const statusTarget = element('profileStatus');
+  if (!summaryTarget || !tableTarget) return;
+
+  const coverage = profileAnalytics.coverage ?? {};
+  const rows = profileAnalytics.rows ?? [];
+  const unavailable = loadIssue || profileAnalytics.available === false;
+
+  if (statusTarget) {
+    statusTarget.textContent = unavailable
+      ? (loadIssue || 'Dados complementares indisponíveis no momento. A análise principal permanece ativa.')
+      : `Proteção aplicada: grupos com menos de ${formatNumber(profileAnalytics.minGroupSize ?? 5)} cursistas foram agrupados.`;
+    statusTarget.classList.remove('is-error');
+    if (unavailable) statusTarget.classList.add('is-error');
+  }
+
+  const cards = [
+    ['Perfis vinculados', coverage.matched ?? 0, `${formatPercent(coverage.percentMatched ?? 0)} da base de presenças`, 'fa-id-card-clip', 'cyan'],
+    ['Sem perfil vinculado', coverage.unmatchedAttendance ?? 0, 'Na base de presenças', 'fa-link-slash', 'yellow'],
+    ['Registros complementares', coverage.totalProfiles ?? 0, `${formatNumber(coverage.profileOnly ?? 0)} sem vínculo no recorte`, 'fa-table-list', 'blue'],
+    ['Grupos protegidos', profileAnalytics.smallGroupsCollapsed ?? 0, 'Agrupados por privacidade', 'fa-shield-heart', 'pink']
+  ];
+
+  summaryTarget.innerHTML = cards.map(([label, value, helper, icon, color]) => `
+    <article class="profile-card">
+      <span class="profile-icon ${escapeHtml(color)}"><i class="fa-solid ${escapeHtml(icon)}"></i></span>
+      <div>
+        <strong>${formatNumber(value)}</strong>
+        <p>${escapeHtml(label)}</p>
+        <small>${escapeHtml(helper)}</small>
+      </div>
+    </article>
+  `).join('');
+
+  if (unavailable) {
+    tableTarget.innerHTML = '<tr><td colspan="8">A planilha complementar não pôde ser carregada agora. Os indicadores de presença seguem disponíveis.</td></tr>';
+    return;
+  }
+
+  if (rows.length === 0) {
+    tableTarget.innerHTML = '<tr><td colspan="8">Não há dados complementares agregados suficientes para o recorte atual.</td></tr>';
+    return;
+  }
+
+  tableTarget.innerHTML = rows.map((row) => `
+    <tr>
+      <td data-label="Recorte">${escapeHtml(row.dimension)}</td>
+      <td data-label="Grupo"><strong>${escapeHtml(row.group)}</strong></td>
+      <td data-label="Cursistas" class="numeric-cell">${formatNumber(row.total)}</td>
+      <td data-label="Frequência média" class="numeric-cell">${formatPercent(row.frequenciaMedia)}</td>
+      <td data-label="Faltas médias" class="numeric-cell">${new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: Number.isInteger(row.faltasMedia) ? 0 : 1,
+        maximumFractionDigits: 1
+      }).format(Number(row.faltasMedia) || 0)}</td>
+      <td data-label="Aptos 0–3 faltas" class="numeric-cell">${formatNumber(row.aptosCertificacao)} <span class="muted-inline">(${formatPercent(row.percentualAptosCertificacao)})</span></td>
+      <td data-label="Críticos 2–3 faltas" class="numeric-cell">${formatNumber(row.criticos)} <span class="muted-inline">(${formatPercent(row.percentualCriticos)})</span></td>
+      <td data-label="Sem possibilidade" class="numeric-cell">${formatNumber(row.naoAptos)} <span class="muted-inline">(${formatPercent(row.percentualNaoAptos)})</span></td>
+    </tr>
+  `).join('');
+}
+
 function readPageSize(id) {
   const value = element(id)?.value ?? '10';
   if (value === 'all') return 'all';

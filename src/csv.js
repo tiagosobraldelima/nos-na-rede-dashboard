@@ -1,4 +1,4 @@
-import { SHEET_CSV_URL } from './config.js';
+import { COMPLEMENTARY_PROFILE_CSV_URL, SHEET_CSV_URL } from './config.js';
 import { normalizeColumnName } from './text.js';
 
 function isEmptyRow(row) {
@@ -60,13 +60,21 @@ export function normalizeRows(rows) {
   });
 }
 
-export async function fetchSheetRows(fetchImpl = fetch) {
-  const separator = SHEET_CSV_URL.includes('?') ? '&' : '?';
-  const response = await fetchImpl(`${SHEET_CSV_URL}${separator}cacheBust=${Date.now()}`, { cache: 'no-store' });
+export async function fetchCsvRows(url, fetchImpl = fetch) {
+  const separator = url.includes('?') ? '&' : '?';
+  const response = await fetchImpl(`${url}${separator}cacheBust=${Date.now()}`, { cache: 'no-store' });
 
   if (!response.ok) {
     throw new Error(`Não foi possível carregar a planilha (${response.status} ${response.statusText}).`);
   }
 
   return normalizeRows(parseCsv(await response.text()));
+}
+
+export function fetchSheetRows(fetchImpl = fetch) {
+  return fetchCsvRows(SHEET_CSV_URL, fetchImpl);
+}
+
+export function fetchProfileRows(fetchImpl = fetch) {
+  return fetchCsvRows(COMPLEMENTARY_PROFILE_CSV_URL, fetchImpl);
 }

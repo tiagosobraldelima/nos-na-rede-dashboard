@@ -1,9 +1,11 @@
 export const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQoGnE2RG9yDysuCwJubfxoJcbbdC8yfeguHrKOXwxyiIGAKxy71hvp8Uow4-3gucHLQlBOqp24NdaU/pub?gid=1700106572&single=true&output=csv';
+export const COMPLEMENTARY_PROFILE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1Zb8Ljbb9fB7BFQpC85FOPQ0QtJARSNt2y8hpbTlV4yrKJFmbuNEBVeThbS-JMSCkTIID2Qe6Kc6J/pub?gid=973871607&single=true&output=csv';
 
 export const TOTAL_ENCOUNTERS = 5;
 export const PERIODS_PER_ENCOUNTER = 2;
 export const TOTAL_PERIODS = TOTAL_ENCOUNTERS * PERIODS_PER_ENCOUNTER;
 export const MIN_VALID_PERIODS = 7;
+export const PROFILE_PRIVACY_MIN_GROUP = 5;
 export const REFRESH_INTERVAL_MS = 60_000;
 
 export const CERTIFICATION_STATUS = {

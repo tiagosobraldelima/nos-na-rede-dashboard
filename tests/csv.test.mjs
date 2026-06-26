@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv, normalizeRows } from '../src/csv.js';
+import { fetchCsvRows, fetchProfileRows, parseCsv, normalizeRows } from '../src/csv.js';
+import { COMPLEMENTARY_PROFILE_CSV_URL } from '../src/config.js';
 import { normalizeColumnName, normalizeValue, titleCasePtBr } from '../src/text.js';
 
 test('normalizes column names with accents, spaces, punctuation and case', () => {
@@ -51,4 +52,32 @@ test('parses quoted CSV values and normalizes sheet columns', () => {
   assert.equal(rows[0].educador_a, 'NAYARA');
   assert.equal(rows[0].turno_1, 'PRESENTE');
   assert.equal(rows[0].turno_2, 'AUSENTE');
+});
+
+test('fetchCsvRows loads arbitrary CSV URLs with cache busting', async () => {
+  let requestedUrl = '';
+  const rows = await fetchCsvRows('https://example.test/base.csv?gid=1', async (url, options) => {
+    requestedUrl = url;
+    assert.equal(options.cache, 'no-store');
+    return {
+      ok: true,
+      text: async () => 'NOME,CPF\nANA,123'
+    };
+  });
+
+  assert.match(requestedUrl, /https:\/\/example\.test\/base\.csv\?gid=1&cacheBust=/);
+  assert.deepEqual(rows, [{ nome: 'ANA', cpf: '123' }]);
+});
+
+test('fetchProfileRows uses the configured complementary profile source', async () => {
+  let requestedUrl = '';
+  await fetchProfileRows(async (url) => {
+    requestedUrl = url;
+    return {
+      ok: true,
+      text: async () => 'NOME COMPLETO,NÚM. INSCRIÇÃO\nANA,1'
+    };
+  });
+
+  assert.match(requestedUrl, new RegExp(COMPLEMENTARY_PROFILE_CSV_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });

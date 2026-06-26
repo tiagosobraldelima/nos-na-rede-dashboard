@@ -1,0 +1,33 @@
+# Dependências
+node_modules/
+
+# Artefatos do sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (usado em `npm run serve` e no `build_dashboard.py`)
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Variáveis de ambiente / segredos
+.env
+.env.local
+.env.*.local

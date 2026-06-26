@@ -142,7 +142,7 @@ export function renderKpis(summary = {}) {
       icon: 'fa-certificate',
       cards: [
         ['Aptos a certificar', summary.aptos, '≥75% de frequência presencial', 'fa-circle-check', 'green', 'success'],
-        ['Não podem mais faltar', summary.naoPodemMaisFaltar ?? 0, 'No limite — toda ausência é crítica', 'fa-triangle-exclamation', 'yellow', 'warning'],
+        ['Não podem mais faltar', summary.naoPodemMaisFaltar ?? 0, 'Já têm 3 faltas contabilizadas', 'fa-triangle-exclamation', 'yellow', 'warning'],
         ['Sem possibilidade', summary.naoAptos, 'Já perderam o direito ao certificado', 'fa-ban', 'red', 'danger']
       ]
     },

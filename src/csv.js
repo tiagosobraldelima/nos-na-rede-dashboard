@@ -61,8 +61,7 @@ export function normalizeRows(rows) {
 }
 
 export async function fetchCsvRows(url, fetchImpl = fetch) {
-  const separator = url.includes('?') ? '&' : '?';
-  const response = await fetchImpl(`${url}${separator}cacheBust=${Date.now()}`, { cache: 'no-store' });
+  const response = await fetchImpl(url, { cache: 'default' });
 
   if (!response.ok) {
     throw new Error(`Não foi possível carregar a planilha (${response.status} ${response.statusText}).`);

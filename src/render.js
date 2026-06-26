@@ -68,16 +68,34 @@ function setSelectOptions(id, options, selectedValue) {
   return selected;
 }
 
-function studentMatchesFilter(student, filters = {}, ignoredKey = '') {
-  const busca = normalizeSearch(filters.busca || '');
-  const searchableContent = [
-    student.nome,
-    student.cpf,
-    student.inscricao,
-    student.turma,
-    student.municipio,
-    student.educador
-  ].join(' ');
+function normalizeSearch(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const STUDENT_SEARCH_KEY_CACHE = new WeakMap();
+
+function getStudentSearchKey(student) {
+  let key = STUDENT_SEARCH_KEY_CACHE.get(student);
+  if (key === undefined) {
+    key = normalizeSearch([
+      student.nome,
+      student.cpf,
+      student.inscricao,
+      student.turma,
+      student.municipio,
+      student.educador
+    ].join(' '));
+    STUDENT_SEARCH_KEY_CACHE.set(student, key);
+  }
+  return key;
+}
+
+function studentMatchesFilter(student, filters = {}, ignoredKey = '', buscaNormalized = '') {
   const checks = {
     turma: () => !filters.turma || filters.turma === 'Todos' || student.turma === filters.turma,
     municipio: () => !filters.municipio || filters.municipio === 'Todos' || student.municipio === filters.municipio,
@@ -95,24 +113,15 @@ function studentMatchesFilter(student, filters = {}, ignoredKey = '') {
       || filters.statusInscricao === 'Todos'
       || student.statusInscricao === filters.statusInscricao
     ),
-    busca: () => !busca || normalizeSearch(searchableContent).includes(busca)
+    busca: () => !buscaNormalized || getStudentSearchKey(student).includes(buscaNormalized)
   };
 
   return Object.entries(checks).every(([key, check]) => key === ignoredKey || check());
 }
 
-function normalizeSearch(value) {
-  return String(value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toUpperCase()
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function optionsFor(model, filters, ignoredKey, selector) {
+function optionsFor(model, filters, ignoredKey, selector, buscaNormalized = '') {
   return [...new Set((model.students ?? [])
-    .filter((student) => studentMatchesFilter(student, filters, ignoredKey))
+    .filter((student) => studentMatchesFilter(student, filters, ignoredKey, buscaNormalized))
     .map(selector)
     .filter(Boolean))]
     .sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
@@ -130,25 +139,26 @@ export function populateFilters(model, currentFilters = {}) {
     statusInscricao: currentFilters.statusInscricao ?? 'Todos',
     busca: currentFilters.busca ?? ''
   };
+  const buscaNormalized = normalizeSearch(normalizedFilters.busca);
 
-  setSelectOptions(FILTER_IDS.turma, optionsFor(model, normalizedFilters, 'turma', (student) => student.turma), normalizedFilters.turma);
-  setSelectOptions(FILTER_IDS.municipio, optionsFor(model, normalizedFilters, 'municipio', (student) => student.municipio), normalizedFilters.municipio);
-  setSelectOptions(FILTER_IDS.educador, optionsFor(model, normalizedFilters, 'educador', (student) => student.educador), normalizedFilters.educador);
-  setSelectOptions(FILTER_IDS.genero, optionsFor(model, normalizedFilters, 'genero', (student) => student.perfil?.genero), normalizedFilters.genero);
-  setSelectOptions(FILTER_IDS.racaEtnia, optionsFor(model, normalizedFilters, 'racaEtnia', (student) => student.perfil?.racaEtnia), normalizedFilters.racaEtnia);
+  setSelectOptions(FILTER_IDS.turma, optionsFor(model, normalizedFilters, 'turma', (student) => student.turma, buscaNormalized), normalizedFilters.turma);
+  setSelectOptions(FILTER_IDS.municipio, optionsFor(model, normalizedFilters, 'municipio', (student) => student.municipio, buscaNormalized), normalizedFilters.municipio);
+  setSelectOptions(FILTER_IDS.educador, optionsFor(model, normalizedFilters, 'educador', (student) => student.educador, buscaNormalized), normalizedFilters.educador);
+  setSelectOptions(FILTER_IDS.genero, optionsFor(model, normalizedFilters, 'genero', (student) => student.perfil?.genero, buscaNormalized), normalizedFilters.genero);
+  setSelectOptions(FILTER_IDS.racaEtnia, optionsFor(model, normalizedFilters, 'racaEtnia', (student) => student.perfil?.racaEtnia, buscaNormalized), normalizedFilters.racaEtnia);
   setSelectOptions(
     FILTER_IDS.vinculoProfissional,
-    optionsFor(model, normalizedFilters, 'vinculoProfissional', (student) => student.perfil?.vinculoProfissional),
+    optionsFor(model, normalizedFilters, 'vinculoProfissional', (student) => student.perfil?.vinculoProfissional, buscaNormalized),
     normalizedFilters.vinculoProfissional
   );
   setSelectOptions(
     FILTER_IDS.situacao,
-    optionsFor(model, normalizedFilters, 'situacao', (student) => student.situacao),
+    optionsFor(model, normalizedFilters, 'situacao', (student) => student.situacao, buscaNormalized),
     normalizedFilters.situacao
   );
   setSelectOptions(
     FILTER_IDS.statusInscricao,
-    optionsFor(model, normalizedFilters, 'statusInscricao', (student) => student.statusInscricao),
+    optionsFor(model, normalizedFilters, 'statusInscricao', (student) => student.statusInscricao, buscaNormalized),
     normalizedFilters.statusInscricao
   );
 

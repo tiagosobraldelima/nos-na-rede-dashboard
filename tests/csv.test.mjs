@@ -54,18 +54,18 @@ test('parses quoted CSV values and normalizes sheet columns', () => {
   assert.equal(rows[0].turno_2, 'AUSENTE');
 });
 
-test('fetchCsvRows loads arbitrary CSV URLs with cache busting', async () => {
+test('fetchCsvRows loads arbitrary CSV URLs with browser default caching', async () => {
   let requestedUrl = '';
   const rows = await fetchCsvRows('https://example.test/base.csv?gid=1', async (url, options) => {
     requestedUrl = url;
-    assert.equal(options.cache, 'no-store');
+    assert.equal(options.cache, 'default');
     return {
       ok: true,
       text: async () => 'NOME,CPF\nANA,123'
     };
   });
 
-  assert.match(requestedUrl, /https:\/\/example\.test\/base\.csv\?gid=1&cacheBust=/);
+  assert.equal(requestedUrl, 'https://example.test/base.csv?gid=1');
   assert.deepEqual(rows, [{ nome: 'ANA', cpf: '123' }]);
 });
 

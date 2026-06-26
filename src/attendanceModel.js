@@ -148,6 +148,12 @@ function buildSummary(students) {
   const aptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.apto).length;
   const acompanhamento = students.filter((student) => student.situacao === CERTIFICATION_STATUS.acompanhamento).length;
   const naoAptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.naoApto).length;
+  const naoPodemMaisFaltar = students.filter((student) => (
+    student.situacao === CERTIFICATION_STATUS.acompanhamento
+    && student.periodosValidos < MIN_VALID_PERIODS
+    && student.periodosValidos + student.periodosRestantesPossiveis === MIN_VALID_PERIODS
+  )).length;
+  const desistentes = students.filter((student) => normalizeValue(student.statusInscricao).includes('DESIST')).length;
   const presencas = students.reduce((sum, student) => sum + student.presencas, 0);
   const faltas = students.reduce((sum, student) => sum + student.faltas, 0);
   const dispensas = students.reduce((sum, student) => sum + student.dispensas, 0);
@@ -167,9 +173,12 @@ function buildSummary(students) {
     aptos,
     acompanhamento,
     naoAptos,
+    naoPodemMaisFaltar,
+    desistentes,
     percentualAptos: percent(aptos, totalCursistas),
     percentualAcompanhamento: percent(acompanhamento, totalCursistas),
-    percentualNaoAptos: percent(naoAptos, totalCursistas)
+    percentualNaoAptos: percent(naoAptos, totalCursistas),
+    percentualDesistentes: percent(desistentes, totalCursistas)
   };
 }
 

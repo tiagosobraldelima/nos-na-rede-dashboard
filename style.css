@@ -285,16 +285,44 @@ select {
 
 .kpi-grid {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.9rem, 1.3vw, 1.2rem);
+}
+
+.kpi-section {
+    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(0.75rem, 1vw, 1rem);
 }
 
+.kpi-section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.65rem 0 -0.1rem;
+    color: #5b5f68;
+    font-family: "Outfit", "Inter", sans-serif;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    font-weight: 900;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+}
+
+.kpi-section-title i {
+    color: var(--color-pink);
+    font-size: 0.95rem;
+}
+
 .kpi-card {
-    min-height: 9.8rem;
+    min-height: 8.4rem;
     padding: clamp(1rem, 1.25vw, 1.25rem);
     border-radius: var(--radius-lg);
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -315,14 +343,25 @@ select {
 }
 
 .kpi-card p {
-    margin: 0.85rem 0 0.35rem;
+    margin: 0.25rem 0 0;
     color: var(--color-muted);
     font-weight: 800;
+    font-size: clamp(0.95rem, 1.3vw, 1.12rem);
+}
+
+.kpi-card small {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--color-muted);
+    font-weight: 700;
+    line-height: 1.35;
 }
 
 .kpi-card strong {
+    display: block;
     font-family: "Outfit", "Inter", sans-serif;
-    font-size: clamp(2rem, 3vw, 3.15rem);
+    font-size: clamp(2rem, 3vw, 3.35rem);
+    line-height: 0.95;
     letter-spacing: -0.05em;
 }
 
@@ -344,6 +383,19 @@ select {
 .kpi-icon.green { background: linear-gradient(135deg, var(--color-green), #9dd65d); }
 .kpi-icon.yellow { background: linear-gradient(135deg, var(--color-yellow), #ffd96c); color: #553f00; }
 .kpi-icon.red { background: linear-gradient(135deg, var(--color-red), #ff6b5e); }
+.kpi-icon.muted { background: linear-gradient(135deg, #d8dde5, #eef2f6); color: #5f646d; }
+
+.kpi-card-success {
+    border-left: 0.28rem solid #13c983;
+}
+
+.kpi-card-warning {
+    border-left: 0.28rem solid #ffb000;
+}
+
+.kpi-card-danger {
+    border-left: 0.28rem solid #ff3434;
+}
 
 .panel {
     padding: clamp(1rem, 1.65vw, 1.45rem);
@@ -882,8 +934,16 @@ select {
         grid-template-columns: repeat(5, minmax(0, 1fr));
     }
 
-    .kpi-grid {
-        grid-template-columns: repeat(8, minmax(0, 1fr));
+    .kpi-section {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .kpi-section:nth-of-type(2) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .kpi-section:nth-of-type(3) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .kpi-card {
@@ -919,7 +979,7 @@ select {
 @media (max-width: 960px) {
     .site-header,
     .filters-grid,
-    .kpi-grid,
+    .kpi-section,
     .charts-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -1042,7 +1102,7 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .kpi-grid {
+    .kpi-section {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.7rem;
     }
@@ -1218,7 +1278,7 @@ select {
 }
 
 @media (max-width: 430px) {
-    .kpi-grid {
+    .kpi-section {
         grid-template-columns: 1fr;
     }
 

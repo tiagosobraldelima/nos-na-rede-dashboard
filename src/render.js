@@ -126,31 +126,52 @@ export function renderKpis(summary = {}) {
   const target = element('kpiGrid');
   if (!target) return;
 
-  const cards = [
-    ['Cursistas', summary.totalCursistas, 'fa-user-graduate', 'blue'],
-    ['Turmas', summary.totalTurmas, 'fa-layer-group', 'cyan'],
-    ['Municípios', summary.totalMunicipios, 'fa-map-location-dot', 'pink'],
-    ['Educadores', summary.totalEducadores, 'fa-person-chalkboard', 'yellow'],
-    ['Períodos por cursista', summary.periodosPorCursista, 'fa-clipboard-list', 'blue'],
-    ['Períodos previstos total', summary.periodosPrevistosTotal, 'fa-calendar-check', 'cyan'],
-    ['Presenças', summary.presencas, 'fa-user-check', 'green'],
-    ['Faltas', summary.faltas, 'fa-user-xmark', 'red'],
-    ['Dispensas', summary.dispensas, 'fa-hand-holding-heart', 'yellow'],
-    ['Frequência geral', formatPercent(summary.percentualGeralFrequencia), 'fa-chart-simple', 'green'],
-    ['Aptos', summary.aptos, 'fa-award', 'green'],
-    ['Em acompanhamento', summary.acompanhamento, 'fa-hourglass-half', 'yellow'],
-    ['Não aptos', summary.naoAptos, 'fa-triangle-exclamation', 'red'],
-    ['Percentual aptos', formatPercent(summary.percentualAptos), 'fa-circle-half-stroke', 'green'],
-    ['Percentual em acompanhamento', formatPercent(summary.percentualAcompanhamento), 'fa-gauge-high', 'yellow'],
-    ['Percentual não aptos', formatPercent(summary.percentualNaoAptos), 'fa-gauge-simple-high', 'red']
+  const sections = [
+    {
+      title: '',
+      icon: '',
+      cards: [
+        ['Total de Cursistas', summary.totalCursistas, 'Participantes no recorte', 'fa-user-graduate', 'pink'],
+        ['Total de Presenças', summary.presencas, '', 'fa-user-check', 'cyan'],
+        ['Total de Faltas', summary.faltas, '', 'fa-user-xmark', 'red'],
+        ['Taxa de frequência', formatPercent(summary.percentualGeralFrequencia), '', 'fa-percent', 'yellow']
+      ]
+    },
+    {
+      title: 'Situação para certificação',
+      icon: 'fa-certificate',
+      cards: [
+        ['Aptos a certificar', summary.aptos, '≥75% de frequência presencial', 'fa-circle-check', 'green', 'success'],
+        ['Não podem mais faltar', summary.naoPodemMaisFaltar ?? 0, 'No limite — toda ausência é crítica', 'fa-triangle-exclamation', 'yellow', 'warning'],
+        ['Sem possibilidade', summary.naoAptos, 'Já perderam o direito ao certificado', 'fa-ban', 'red', 'danger']
+      ]
+    },
+    {
+      title: 'Cobertura e status',
+      icon: 'fa-chart-pie',
+      cards: [
+        ['Municípios', summary.totalMunicipios, 'Abrangência territorial', 'fa-map-location-dot', 'blue'],
+        ['Turmas', summary.totalTurmas, 'Turmas ativas no recorte', 'fa-layer-group', 'cyan'],
+        ['Educadores(as)', summary.totalEducadores, 'Educadores no recorte', 'fa-person-chalkboard', 'green'],
+        ['Desistentes', summary.desistentes ?? 0, `${formatPercent(summary.percentualDesistentes ?? 0)} do total`, 'fa-user-slash', 'muted']
+      ]
+    }
   ];
 
-  target.innerHTML = cards.map(([label, value, icon, color]) => `
-    <article class="kpi-card">
-      <span class="kpi-icon ${escapeHtml(color)}"><i class="fa-solid ${escapeHtml(icon)}"></i></span>
-      <p>${escapeHtml(label)}</p>
-      <strong>${typeof value === 'number' ? formatNumber(value) : escapeHtml(value)}</strong>
-    </article>
+  target.innerHTML = sections.map((section) => `
+    ${section.title ? `<h2 class="kpi-section-title"><i class="fa-solid ${escapeHtml(section.icon)}"></i>${escapeHtml(section.title)}</h2>` : ''}
+    <div class="kpi-section">
+      ${section.cards.map(([label, value, helper, icon, color, tone]) => `
+        <article class="kpi-card ${tone ? `kpi-card-${escapeHtml(tone)}` : ''}">
+          <div>
+            <strong>${typeof value === 'number' ? formatNumber(value) : escapeHtml(value)}</strong>
+            <p>${escapeHtml(label)}</p>
+            ${helper ? `<small>${escapeHtml(helper)}</small>` : ''}
+          </div>
+          <span class="kpi-icon ${escapeHtml(color)}"><i class="fa-solid ${escapeHtml(icon)}"></i></span>
+        </article>
+      `).join('')}
+    </div>
   `).join('');
 }
 

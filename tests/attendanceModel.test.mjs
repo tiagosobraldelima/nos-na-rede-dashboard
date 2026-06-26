@@ -148,6 +148,36 @@ test('marks student as not apt when remaining periods cannot reach seven', () =>
   assert.equal(bruno.situacao, CERTIFICATION_STATUS.naoApto);
 });
 
+test('counts students who cannot miss any remaining period and still keep certification chance', () => {
+  const rows = [
+    ['1º', 'PRESENTE', 'PRESENTE'],
+    ['2º', 'PRESENTE', 'PRESENTE'],
+    ['3º', 'PRESENTE', 'AUSENTE'],
+    ['4º', 'AUSENTE', 'AUSENTE']
+  ].map(([n_encontro, turno_1, turno_2], index) => ({
+    ord: String(index + 1),
+    nome: 'CLARA LIMA',
+    cpf: '333',
+    n_inscricao: 'C1',
+    status_da_inscricao: 'INSCRITO',
+    municipio: 'MACEIÓ',
+    turma: 'AL-MACEIÓ',
+    email: 'clara@example.com',
+    educador_a: 'NAYARA VILELA',
+    n_encontro,
+    data_do_encontro: '2026-05-01',
+    turno_1,
+    turno_2,
+    observacoes: ''
+  }));
+  const model = buildAttendanceModel(rows);
+
+  assert.equal(model.students[0].periodosValidos, 5);
+  assert.equal(model.students[0].periodosRestantesPossiveis, 2);
+  assert.equal(model.students[0].situacao, CERTIFICATION_STATUS.acompanhamento);
+  assert.equal(model.summary.naoPodemMaisFaltar, 1);
+});
+
 test('aggregates summary and filters by turma, municipio, educator, situation and inscription status', () => {
   const model = buildAttendanceModel(baseRows);
   const filtered = applyFilters(model, {

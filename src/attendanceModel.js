@@ -148,11 +148,10 @@ function buildSummary(students) {
   const aptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.apto).length;
   const acompanhamento = students.filter((student) => student.situacao === CERTIFICATION_STATUS.acompanhamento).length;
   const naoAptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.naoApto).length;
-  const maxFaltasParaCertificacao = TOTAL_PERIODS - MIN_VALID_PERIODS;
   const naoPodemMaisFaltar = students.filter((student) => (
     student.situacao === CERTIFICATION_STATUS.acompanhamento
     && student.periodosValidos < MIN_VALID_PERIODS
-    && student.faltas === maxFaltasParaCertificacao
+    && [2, 3].includes(student.faltas)
   )).length;
   const desistentes = students.filter((student) => normalizeValue(student.statusInscricao).includes('DESIST')).length;
   const presencas = students.reduce((sum, student) => sum + student.presencas, 0);

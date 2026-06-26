@@ -148,8 +148,8 @@ test('marks student as not apt when remaining periods cannot reach seven', () =>
   assert.equal(bruno.situacao, CERTIFICATION_STATUS.naoApto);
 });
 
-test('counts students who cannot miss any remaining period and still keep certification chance', () => {
-  const rows = [
+test('counts critical students with two or three absences who cannot miss more periods', () => {
+  const claraRows = [
     ['1º', 'PRESENTE', 'PRESENTE'],
     ['2º', 'PRESENTE', 'PRESENTE'],
     ['3º', 'PRESENTE', 'AUSENTE'],
@@ -170,12 +170,35 @@ test('counts students who cannot miss any remaining period and still keep certif
     turno_2,
     observacoes: ''
   }));
-  const model = buildAttendanceModel(rows);
+  const danielRows = [
+    ['1º', 'PRESENTE', 'PRESENTE'],
+    ['2º', 'PRESENTE', 'PRESENTE'],
+    ['3º', 'AUSENTE', 'AUSENTE']
+  ].map(([n_encontro, turno_1, turno_2], index) => ({
+    ord: String(index + 10),
+    nome: 'DANIEL ROCHA',
+    cpf: '444',
+    n_inscricao: 'D1',
+    status_da_inscricao: 'INSCRITO',
+    municipio: 'MACEIÓ',
+    turma: 'AL-PIRANHAS',
+    email: 'daniel@example.com',
+    educador_a: 'NAYARA VILELA',
+    n_encontro,
+    data_do_encontro: '2026-05-01',
+    turno_1,
+    turno_2,
+    observacoes: ''
+  }));
+  const model = buildAttendanceModel([...claraRows, ...danielRows]);
 
-  assert.equal(model.students[0].periodosValidos, 5);
-  assert.equal(model.students[0].periodosRestantesPossiveis, 2);
-  assert.equal(model.students[0].situacao, CERTIFICATION_STATUS.acompanhamento);
-  assert.equal(model.summary.naoPodemMaisFaltar, 1);
+  const clara = model.students.find((student) => student.nome === 'Clara Lima');
+  const daniel = model.students.find((student) => student.nome === 'Daniel Rocha');
+  assert.equal(clara.faltas, 3);
+  assert.equal(daniel.faltas, 2);
+  assert.equal(clara.situacao, CERTIFICATION_STATUS.acompanhamento);
+  assert.equal(daniel.situacao, CERTIFICATION_STATUS.acompanhamento);
+  assert.equal(model.summary.naoPodemMaisFaltar, 2);
 });
 
 test('aggregates summary and filters by turma, municipio, educator, situation and inscription status', () => {

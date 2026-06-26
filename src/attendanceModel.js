@@ -146,6 +146,7 @@ function uniqueCount(items, selector) {
 function buildSummary(students) {
   const totalCursistas = students.length;
   const aptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.apto).length;
+  const aptosCertificacao = students.filter((student) => student.faltas >= 0 && student.faltas <= 3).length;
   const acompanhamento = students.filter((student) => student.situacao === CERTIFICATION_STATUS.acompanhamento).length;
   const naoAptos = students.filter((student) => student.situacao === CERTIFICATION_STATUS.naoApto).length;
   const naoPodemMaisFaltar = students.filter((student) => (
@@ -171,11 +172,13 @@ function buildSummary(students) {
     dispensas,
     percentualGeralFrequencia: percent(validos, totalCursistas * TOTAL_PERIODS),
     aptos,
+    aptosCertificacao,
     acompanhamento,
     naoAptos,
     naoPodemMaisFaltar,
     desistentes,
     percentualAptos: percent(aptos, totalCursistas),
+    percentualAptosCertificacao: percent(aptosCertificacao, totalCursistas),
     percentualAcompanhamento: percent(acompanhamento, totalCursistas),
     percentualNaoAptos: percent(naoAptos, totalCursistas),
     percentualDesistentes: percent(desistentes, totalCursistas)

@@ -201,6 +201,52 @@ test('counts critical students with two or three absences who cannot miss more p
   assert.equal(model.summary.naoPodemMaisFaltar, 2);
 });
 
+test('counts certification-ready students by zero to three absences for the KPI card', () => {
+  const rows = [
+    ['ANA', '111', 'A1', 'PRESENTE', 'PRESENTE'],
+    ['BRUNO', '222', 'B1', 'PRESENTE', 'AUSENTE'],
+    ['CLARA', '333', 'C1', 'AUSENTE', 'AUSENTE'],
+    ['DANIEL', '444', 'D1', 'AUSENTE', 'AUSENTE']
+  ].flatMap(([nome, cpf, inscricao, turno_1, turno_2], index) => ([
+    {
+      ord: String(index + 1),
+      nome,
+      cpf,
+      n_inscricao: inscricao,
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'MACEIÓ',
+      turma: 'AL-MACEIÓ',
+      email: `${nome.toLowerCase()}@example.com`,
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '1º',
+      data_do_encontro: '2026-05-01',
+      turno_1,
+      turno_2,
+      observacoes: ''
+    },
+    {
+      ord: String(index + 10),
+      nome,
+      cpf,
+      n_inscricao: inscricao,
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'MACEIÓ',
+      turma: 'AL-MACEIÓ',
+      email: `${nome.toLowerCase()}@example.com`,
+      educador_a: 'NAYARA VILELA',
+      n_encontro: '2º',
+      data_do_encontro: '2026-05-08',
+      turno_1: index === 3 ? 'AUSENTE' : 'PRESENTE',
+      turno_2: index === 3 ? 'AUSENTE' : 'PRESENTE',
+      observacoes: ''
+    }
+  ]));
+  const model = buildAttendanceModel(rows);
+
+  assert.equal(model.students.find((student) => student.nome === 'Daniel').faltas, 4);
+  assert.equal(model.summary.aptosCertificacao, 3);
+});
+
 test('aggregates summary and filters by turma, municipio, educator, situation and inscription status', () => {
   const model = buildAttendanceModel(baseRows);
   const filtered = applyFilters(model, {

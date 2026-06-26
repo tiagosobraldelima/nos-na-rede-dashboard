@@ -141,7 +141,7 @@ export function renderKpis(summary = {}) {
       title: 'Situação para certificação',
       icon: 'fa-certificate',
       cards: [
-        ['Aptos a certificar', summary.aptos, '≥75% de frequência presencial', 'fa-circle-check', 'green', 'success'],
+        ['Aptos a certificar', summary.aptosCertificacao ?? summary.aptos, '0 a 3 faltas contabilizadas', 'fa-circle-check', 'green', 'success'],
         ['Não podem mais faltar', summary.naoPodemMaisFaltar ?? 0, 'Críticos: 2 ou 3 faltas contabilizadas', 'fa-triangle-exclamation', 'yellow', 'warning'],
         ['Sem possibilidade', summary.naoAptos, 'Já perderam o direito ao certificado', 'fa-ban', 'red', 'danger']
       ]

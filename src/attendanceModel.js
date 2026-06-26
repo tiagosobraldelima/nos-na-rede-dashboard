@@ -2,6 +2,7 @@ import {
   CERTIFICATION_STATUS,
   MIN_VALID_PERIODS,
   PERIODS_PER_ENCOUNTER,
+  PROFILE_PRIVACY_MIN_GROUP,
   TOTAL_ENCOUNTERS,
   TOTAL_PERIODS
 } from './config.js';
@@ -324,14 +325,28 @@ export function applyFilters(model, filters) {
       && (!filters.turma || filters.turma === 'Todos' || student.turma === filters.turma)
       && (!filters.municipio || filters.municipio === 'Todos' || student.municipio === filters.municipio)
       && (!filters.educador || filters.educador === 'Todos' || student.educador === filters.educador)
+      && (!filters.genero || filters.genero === 'Todos' || student.perfil?.genero === filters.genero)
+      && (!filters.racaEtnia || filters.racaEtnia === 'Todos' || student.perfil?.racaEtnia === filters.racaEtnia)
+      && (
+        !filters.vinculoProfissional
+        || filters.vinculoProfissional === 'Todos'
+        || student.perfil?.vinculoProfissional === filters.vinculoProfissional
+      )
       && (!filters.situacao || filters.situacao === 'Todos' || student.situacao === filters.situacao)
       && (!filters.statusInscricao || filters.statusInscricao === 'Todos' || student.statusInscricao === filters.statusInscricao);
   });
+  const profileFilterActive = ['genero', 'racaEtnia', 'vinculoProfissional']
+    .some((key) => filters[key] && filters[key] !== 'Todos');
+  const privacyBlocked = profileFilterActive && students.length > 0 && students.length < PROFILE_PRIVACY_MIN_GROUP;
 
   return {
     ...model,
     students,
     summary: buildSummary(students),
-    breakdowns: buildBreakdowns(students)
+    breakdowns: buildBreakdowns(students),
+    privacyBlocked,
+    privacyMessage: privacyBlocked
+      ? `Recorte protegido: os filtros de perfil retornaram menos de ${PROFILE_PRIVACY_MIN_GROUP} cursistas. Ajuste os filtros para visualizar listas e relatórios individuais.`
+      : ''
   };
 }

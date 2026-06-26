@@ -295,3 +295,37 @@ export function buildProfileAnalytics(students = [], profileRows = []) {
     smallGroupsCollapsed
   };
 }
+
+export function enrichAttendanceModelWithProfiles(model = {}, profileRows = []) {
+  const profiles = profileRows.map(normalizeProfile);
+  const { matches } = matchProfiles(model.students ?? [], profiles);
+  const profileByStudent = new Map(matches.map(({ student, profile }) => [student, profile]));
+  const students = (model.students ?? []).map((student) => {
+    const profile = profileByStudent.get(student);
+    return {
+      ...student,
+      perfil: profile ? {
+        genero: profile.genero,
+        racaEtnia: profile.racaEtnia,
+        vinculoProfissional: profile.vinculoProfissional
+      } : {
+        genero: NOT_INFORMED,
+        racaEtnia: NOT_INFORMED,
+        vinculoProfissional: NOT_INFORMED
+      }
+    };
+  });
+
+  const uniqueProfileOptions = (selector) => [...new Set(students.map(selector).filter(Boolean))].sort();
+
+  return {
+    ...model,
+    students,
+    options: {
+      ...(model.options ?? {}),
+      generos: uniqueProfileOptions((student) => student.perfil?.genero),
+      racasEtnias: uniqueProfileOptions((student) => student.perfil?.racaEtnia),
+      vinculosProfissionais: uniqueProfileOptions((student) => student.perfil?.vinculoProfissional)
+    }
+  };
+}

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CERTIFICATION_STATUS } from '../src/config.js';
-import { buildProfileAnalytics } from '../src/profileModel.js';
+import { buildProfileAnalytics, enrichAttendanceModelWithProfiles } from '../src/profileModel.js';
 
 function student(index, overrides = {}) {
   return {
@@ -98,4 +98,34 @@ test('buildProfileAnalytics reports unmatched attendance and profile-only record
   assert.equal(analytics.coverage.matched, 1);
   assert.equal(analytics.coverage.unmatchedAttendance, 1);
   assert.equal(analytics.coverage.profileOnly, 1);
+});
+
+test('enrichAttendanceModelWithProfiles adds safe profile fields and filter options', () => {
+  const students = [student(1), student(2)];
+  const model = {
+    students,
+    options: {
+      turmas: ['Turma A']
+    }
+  };
+  const enriched = enrichAttendanceModelWithProfiles(model, [
+    {
+      cpf: students[0].cpf,
+      n_inscricao: students[0].inscricao,
+      nome_completo: students[0].nome,
+      turma: students[0].turma,
+      municipio: students[0].municipio,
+      iden_genero: 'Mulher cisgênero',
+      raca_etnia: 'Parda',
+      vinculo_profissional: 'Contrato'
+    }
+  ]);
+
+  assert.equal(enriched.students[0].perfil.genero, 'Mulher cisgênero');
+  assert.equal(enriched.students[0].perfil.racaEtnia, 'Parda');
+  assert.equal(enriched.students[0].perfil.vinculoProfissional, 'Contrato');
+  assert.equal(enriched.students[1].perfil.genero, 'Não informado');
+  assert.deepEqual(enriched.options.generos, ['Mulher cisgênero', 'Não informado']);
+  assert.deepEqual(enriched.options.racasEtnias, ['Não informado', 'Parda']);
+  assert.deepEqual(enriched.options.vinculosProfissionais, ['Contrato', 'Não informado']);
 });

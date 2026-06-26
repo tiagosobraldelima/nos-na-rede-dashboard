@@ -4,6 +4,9 @@ const FILTER_IDS = {
   turma: 'filterTurma',
   municipio: 'filterMunicipio',
   educador: 'filterEducador',
+  genero: 'filterGenero',
+  racaEtnia: 'filterRacaEtnia',
+  vinculoProfissional: 'filterVinculoProfissional',
   situacao: 'filterSituacao',
   statusInscricao: 'filterStatusInscricao',
   busca: 'filterBusca'
@@ -65,61 +68,92 @@ function setSelectOptions(id, options, selectedValue) {
   return selected;
 }
 
-function turmasForSelectedEducador(model, selectedEducador) {
-  const allTurmas = model.options?.turmas ?? [];
-  if (!selectedEducador || selectedEducador === 'Todos') return allTurmas;
-  if (!Array.isArray(model.students) || model.students.length === 0) return allTurmas;
+function studentMatchesFilter(student, filters = {}, ignoredKey = '') {
+  const busca = normalizeSearch(filters.busca || '');
+  const searchableContent = [
+    student.nome,
+    student.cpf,
+    student.inscricao,
+    student.turma,
+    student.municipio,
+    student.educador
+  ].join(' ');
+  const checks = {
+    turma: () => !filters.turma || filters.turma === 'Todos' || student.turma === filters.turma,
+    municipio: () => !filters.municipio || filters.municipio === 'Todos' || student.municipio === filters.municipio,
+    educador: () => !filters.educador || filters.educador === 'Todos' || student.educador === filters.educador,
+    genero: () => !filters.genero || filters.genero === 'Todos' || student.perfil?.genero === filters.genero,
+    racaEtnia: () => !filters.racaEtnia || filters.racaEtnia === 'Todos' || student.perfil?.racaEtnia === filters.racaEtnia,
+    vinculoProfissional: () => (
+      !filters.vinculoProfissional
+      || filters.vinculoProfissional === 'Todos'
+      || student.perfil?.vinculoProfissional === filters.vinculoProfissional
+    ),
+    situacao: () => !filters.situacao || filters.situacao === 'Todos' || student.situacao === filters.situacao,
+    statusInscricao: () => (
+      !filters.statusInscricao
+      || filters.statusInscricao === 'Todos'
+      || student.statusInscricao === filters.statusInscricao
+    ),
+    busca: () => !busca || normalizeSearch(searchableContent).includes(busca)
+  };
 
-  const linkedTurmas = new Set(
-    (model.students ?? [])
-      .filter((student) => student.educador === selectedEducador)
-      .map((student) => student.turma)
-      .filter(Boolean)
-  );
-
-  return allTurmas.filter((turma) => linkedTurmas.has(turma));
+  return Object.entries(checks).every(([key, check]) => key === ignoredKey || check());
 }
 
-function educadoresForSelectedTurma(model, selectedTurma) {
-  const allEducadores = model.options?.educadores ?? [];
-  if (!selectedTurma || selectedTurma === 'Todos') return allEducadores;
-  if (!Array.isArray(model.students) || model.students.length === 0) return allEducadores;
+function normalizeSearch(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-  const linkedEducadores = new Set(
-    (model.students ?? [])
-      .filter((student) => student.turma === selectedTurma)
-      .map((student) => student.educador)
-      .filter(Boolean)
-  );
-
-  return allEducadores.filter((educador) => linkedEducadores.has(educador));
+function optionsFor(model, filters, ignoredKey, selector) {
+  return [...new Set((model.students ?? [])
+    .filter((student) => studentMatchesFilter(student, filters, ignoredKey))
+    .map(selector)
+    .filter(Boolean))]
+    .sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
 }
 
 export function populateFilters(model, currentFilters = {}) {
-  const selectedEducador = setSelectOptions(
-    FILTER_IDS.educador,
-    educadoresForSelectedTurma(model, currentFilters.turma),
-    currentFilters.educador
-  );
+  const normalizedFilters = {
+    turma: currentFilters.turma ?? 'Todos',
+    municipio: currentFilters.municipio ?? 'Todos',
+    educador: currentFilters.educador ?? 'Todos',
+    genero: currentFilters.genero ?? 'Todos',
+    racaEtnia: currentFilters.racaEtnia ?? 'Todos',
+    vinculoProfissional: currentFilters.vinculoProfissional ?? 'Todos',
+    situacao: currentFilters.situacao ?? 'Todos',
+    statusInscricao: currentFilters.statusInscricao ?? 'Todos',
+    busca: currentFilters.busca ?? ''
+  };
+
+  setSelectOptions(FILTER_IDS.turma, optionsFor(model, normalizedFilters, 'turma', (student) => student.turma), normalizedFilters.turma);
+  setSelectOptions(FILTER_IDS.municipio, optionsFor(model, normalizedFilters, 'municipio', (student) => student.municipio), normalizedFilters.municipio);
+  setSelectOptions(FILTER_IDS.educador, optionsFor(model, normalizedFilters, 'educador', (student) => student.educador), normalizedFilters.educador);
+  setSelectOptions(FILTER_IDS.genero, optionsFor(model, normalizedFilters, 'genero', (student) => student.perfil?.genero), normalizedFilters.genero);
+  setSelectOptions(FILTER_IDS.racaEtnia, optionsFor(model, normalizedFilters, 'racaEtnia', (student) => student.perfil?.racaEtnia), normalizedFilters.racaEtnia);
   setSelectOptions(
-    FILTER_IDS.turma,
-    turmasForSelectedEducador(model, selectedEducador),
-    currentFilters.turma
+    FILTER_IDS.vinculoProfissional,
+    optionsFor(model, normalizedFilters, 'vinculoProfissional', (student) => student.perfil?.vinculoProfissional),
+    normalizedFilters.vinculoProfissional
   );
-  setSelectOptions(FILTER_IDS.municipio, model.options?.municipios ?? [], currentFilters.municipio);
   setSelectOptions(
     FILTER_IDS.situacao,
-    Object.values(CERTIFICATION_STATUS),
-    currentFilters.situacao
+    optionsFor(model, normalizedFilters, 'situacao', (student) => student.situacao),
+    normalizedFilters.situacao
   );
   setSelectOptions(
     FILTER_IDS.statusInscricao,
-    model.options?.statusInscricao ?? [],
-    currentFilters.statusInscricao
+    optionsFor(model, normalizedFilters, 'statusInscricao', (student) => student.statusInscricao),
+    normalizedFilters.statusInscricao
   );
 
   const busca = element(FILTER_IDS.busca);
-  if (busca) busca.value = currentFilters.busca ?? '';
+  if (busca) busca.value = normalizedFilters.busca;
 }
 
 export function renderKpis(summary = {}) {
@@ -210,12 +244,10 @@ export function renderReportSummary(summary = {}) {
 
 export function renderProfileAnalytics(profileAnalytics = {}, loadIssue = '') {
   const summaryTarget = element('profileSummary');
-  const tableTarget = element('profileTable');
   const statusTarget = element('profileStatus');
-  if (!summaryTarget || !tableTarget) return;
+  if (!summaryTarget) return;
 
   const coverage = profileAnalytics.coverage ?? {};
-  const rows = profileAnalytics.rows ?? [];
   const unavailable = loadIssue || profileAnalytics.available === false;
 
   if (statusTarget) {
@@ -243,32 +275,6 @@ export function renderProfileAnalytics(profileAnalytics = {}, loadIssue = '') {
       </div>
     </article>
   `).join('');
-
-  if (unavailable) {
-    tableTarget.innerHTML = '<tr><td colspan="8">A planilha complementar não pôde ser carregada agora. Os indicadores de presença seguem disponíveis.</td></tr>';
-    return;
-  }
-
-  if (rows.length === 0) {
-    tableTarget.innerHTML = '<tr><td colspan="8">Não há dados complementares agregados suficientes para o recorte atual.</td></tr>';
-    return;
-  }
-
-  tableTarget.innerHTML = rows.map((row) => `
-    <tr>
-      <td data-label="Recorte">${escapeHtml(row.dimension)}</td>
-      <td data-label="Grupo"><strong>${escapeHtml(row.group)}</strong></td>
-      <td data-label="Cursistas" class="numeric-cell">${formatNumber(row.total)}</td>
-      <td data-label="Frequência média" class="numeric-cell">${formatPercent(row.frequenciaMedia)}</td>
-      <td data-label="Faltas médias" class="numeric-cell">${new Intl.NumberFormat('pt-BR', {
-        minimumFractionDigits: Number.isInteger(row.faltasMedia) ? 0 : 1,
-        maximumFractionDigits: 1
-      }).format(Number(row.faltasMedia) || 0)}</td>
-      <td data-label="Aptos 0–3 faltas" class="numeric-cell">${formatNumber(row.aptosCertificacao)} <span class="muted-inline">(${formatPercent(row.percentualAptosCertificacao)})</span></td>
-      <td data-label="Críticos 2–3 faltas" class="numeric-cell">${formatNumber(row.criticos)} <span class="muted-inline">(${formatPercent(row.percentualCriticos)})</span></td>
-      <td data-label="Sem possibilidade" class="numeric-cell">${formatNumber(row.naoAptos)} <span class="muted-inline">(${formatPercent(row.percentualNaoAptos)})</span></td>
-    </tr>
-  `).join('');
 }
 
 function readPageSize(id) {
@@ -282,9 +288,16 @@ export function readRiskPageSize() {
   return readPageSize(RISK_PAGE_SIZE_ID);
 }
 
-export function renderRiskList(students = [], pageSize = readRiskPageSize()) {
+export function renderRiskList(students = [], pageSize = readRiskPageSize(), privacyBlocked = false, privacyMessage = '') {
   const target = element('riskList');
   if (!target) return;
+
+  if (privacyBlocked) {
+    target.innerHTML = `<tr><td colspan="7">${escapeHtml(privacyMessage)}</td></tr>`;
+    const riskStatus = element('riskDisplayStatus');
+    if (riskStatus) riskStatus.textContent = 'Visualização individual protegida por privacidade.';
+    return;
+  }
 
   const riskStudents = students
     .filter((student) => (
@@ -332,9 +345,16 @@ export function readTablePageSize() {
   return readPageSize(TABLE_PAGE_SIZE_ID);
 }
 
-export function renderStudentTable(students = [], pageSize = readTablePageSize()) {
+export function renderStudentTable(students = [], pageSize = readTablePageSize(), privacyBlocked = false, privacyMessage = '') {
   const target = element('studentTable');
   if (!target) return;
+
+  if (privacyBlocked) {
+    target.innerHTML = `<tr><td colspan="10">${escapeHtml(privacyMessage)}</td></tr>`;
+    const tableStatus = element('tableDisplayStatus');
+    if (tableStatus) tableStatus.textContent = 'Visualização individual protegida por privacidade.';
+    return;
+  }
 
   if (students.length === 0) {
     target.innerHTML = '<tr><td colspan="10">Nenhum participante encontrado para os filtros atuais.</td></tr>';
@@ -421,6 +441,9 @@ export function readFilters() {
     turma: element(FILTER_IDS.turma)?.value || 'Todos',
     municipio: element(FILTER_IDS.municipio)?.value || 'Todos',
     educador: element(FILTER_IDS.educador)?.value || 'Todos',
+    genero: element(FILTER_IDS.genero)?.value || 'Todos',
+    racaEtnia: element(FILTER_IDS.racaEtnia)?.value || 'Todos',
+    vinculoProfissional: element(FILTER_IDS.vinculoProfissional)?.value || 'Todos',
     encontro: 'Todos',
     situacao: element(FILTER_IDS.situacao)?.value || 'Todos',
     statusInscricao: element(FILTER_IDS.statusInscricao)?.value || 'Todos',

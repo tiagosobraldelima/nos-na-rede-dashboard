@@ -209,3 +209,22 @@ test('resolveDownloadModel uses the full base for table downloads when page size
     filteredModel
   );
 });
+
+test('resolveDownloadModel keeps filtered model when profile filters are active', () => {
+  const filteredModel = { students: students.slice(0, 2) };
+  const fullModel = { students };
+
+  assert.equal(
+    resolveDownloadModel({
+      model: filteredModel,
+      fullModel,
+      tablePageSize: 'all',
+      filters: {
+        genero: 'Mulher cisgênero',
+        racaEtnia: 'Todos',
+        vinculoProfissional: 'Todos'
+      }
+    }, 'table'),
+    filteredModel
+  );
+});

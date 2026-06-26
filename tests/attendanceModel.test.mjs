@@ -268,6 +268,41 @@ test('aggregates summary and filters by turma, municipio, educator, situation an
   assert.equal(filtered.summary.periodosPrevistosTotal, 10);
 });
 
+test('filters by complementary profile fields and protects small sensitive cuts', () => {
+  const model = buildAttendanceModel(baseRows);
+  const students = model.students.map((student) => ({
+    ...student,
+    perfil: student.nome === 'Ana Maria'
+      ? {
+        genero: 'Mulher cisgênero',
+        racaEtnia: 'Parda',
+        vinculoProfissional: 'Contrato'
+      }
+      : {
+        genero: 'Homem cisgênero',
+        racaEtnia: 'Branca',
+        vinculoProfissional: 'Estatutário'
+      }
+  }));
+  const filtered = applyFilters({ ...model, students }, {
+    turma: 'Todos',
+    municipio: 'Todos',
+    educador: 'Todos',
+    genero: 'Mulher cisgênero',
+    racaEtnia: 'Parda',
+    vinculoProfissional: 'Contrato',
+    situacao: 'Todos',
+    statusInscricao: 'Todos',
+    encontro: 'Todos',
+    busca: ''
+  });
+
+  assert.deepEqual(filtered.students.map((student) => student.nome), ['Ana Maria']);
+  assert.equal(filtered.summary.totalCursistas, 1);
+  assert.equal(filtered.privacyBlocked, true);
+  assert.match(filtered.privacyMessage, /menos de 5/);
+});
+
 test('aggregates breakdown by certification situation', () => {
   const model = buildAttendanceModel(baseRows);
 

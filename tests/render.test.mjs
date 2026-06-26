@@ -60,6 +60,9 @@ function setupDocument() {
     'filterTurma',
     'filterMunicipio',
     'filterEducador',
+    'filterGenero',
+    'filterRacaEtnia',
+    'filterVinculoProfissional',
     'filterSituacao',
     'filterStatusInscricao',
     'filterBusca',
@@ -90,18 +93,37 @@ function setupDocument() {
 test('populateFilters preserves valid selections and readFilters returns the current state', () => {
   setupDocument();
   const model = {
+    students: [{
+      nome: 'Ana Teste',
+      turma: 'Turma B',
+      municipio: 'Maceió',
+      educador: 'Educadora',
+      situacao: CERTIFICATION_STATUS.naoApto,
+      statusInscricao: 'INSCRITO',
+      perfil: {
+        genero: 'Mulher cisgênero',
+        racaEtnia: 'Parda',
+        vinculoProfissional: 'Contrato'
+      }
+    }],
     options: {
       turmas: ['Turma A', 'Turma B'],
       municipios: ['Maceió'],
       educadores: ['Educadora'],
+      generos: ['Mulher cisgênero'],
+      racasEtnias: ['Parda'],
+      vinculosProfissionais: ['Contrato'],
       statusInscricao: ['INSCRITO']
     }
   };
 
   populateFilters(model, {
     turma: 'Turma B',
-    municipio: 'Cidade removida',
+    municipio: 'Maceió',
     educador: 'Educadora',
+    genero: 'Mulher cisgênero',
+    racaEtnia: 'Parda',
+    vinculoProfissional: 'Contrato',
     situacao: CERTIFICATION_STATUS.naoApto,
     statusInscricao: 'INSCRITO',
     busca: 'ana'
@@ -109,11 +131,14 @@ test('populateFilters preserves valid selections and readFilters returns the cur
 
   assert.match(document.getElementById('filterTurma').innerHTML, /value="Todos"/);
   assert.equal(document.getElementById('filterTurma').value, 'Turma B');
-  assert.equal(document.getElementById('filterMunicipio').value, 'Todos');
+  assert.equal(document.getElementById('filterMunicipio').value, 'Maceió');
   assert.deepEqual(readFilters(), {
     turma: 'Turma B',
-    municipio: 'Todos',
+    municipio: 'Maceió',
     educador: 'Educadora',
+    genero: 'Mulher cisgênero',
+    racaEtnia: 'Parda',
+    vinculoProfissional: 'Contrato',
     encontro: 'Todos',
     situacao: CERTIFICATION_STATUS.naoApto,
     statusInscricao: 'INSCRITO',
@@ -125,9 +150,9 @@ test('populateFilters restricts turma options to the selected educator', () => {
   setupDocument();
   const model = {
     students: [
-      { turma: 'Turma A', educador: 'Educadora 1' },
-      { turma: 'Turma B', educador: 'Educadora 1' },
-      { turma: 'Turma C', educador: 'Educadora 2' }
+      { turma: 'Turma A', municipio: 'Maceió', educador: 'Educadora 1', perfil: {} },
+      { turma: 'Turma B', municipio: 'Arapiraca', educador: 'Educadora 1', perfil: {} },
+      { turma: 'Turma C', municipio: 'Penedo', educador: 'Educadora 2', perfil: {} }
     ],
     options: {
       turmas: ['Turma A', 'Turma B', 'Turma C'],
@@ -147,15 +172,19 @@ test('populateFilters restricts turma options to the selected educator', () => {
   assert.match(turmaSelect.innerHTML, /Turma B/);
   assert.doesNotMatch(turmaSelect.innerHTML, /Turma C/);
   assert.equal(turmaSelect.value, 'Todos');
+  const municipioSelect = document.getElementById('filterMunicipio');
+  assert.match(municipioSelect.innerHTML, /Maceió/);
+  assert.match(municipioSelect.innerHTML, /Arapiraca/);
+  assert.doesNotMatch(municipioSelect.innerHTML, /Penedo/);
 });
 
 test('populateFilters restricts educator options to the selected turma', () => {
   setupDocument();
   const model = {
     students: [
-      { turma: 'Turma A', educador: 'Educadora 1' },
-      { turma: 'Turma B', educador: 'Educadora 1' },
-      { turma: 'Turma C', educador: 'Educadora 2' }
+      { turma: 'Turma A', municipio: 'Maceió', educador: 'Educadora 1', perfil: {} },
+      { turma: 'Turma B', municipio: 'Maceió', educador: 'Educadora 1', perfil: {} },
+      { turma: 'Turma C', municipio: 'Penedo', educador: 'Educadora 2', perfil: {} }
     ],
     options: {
       turmas: ['Turma A', 'Turma B', 'Turma C'],
@@ -174,6 +203,51 @@ test('populateFilters restricts educator options to the selected turma', () => {
   assert.match(educadorSelect.innerHTML, /Educadora 2/);
   assert.doesNotMatch(educadorSelect.innerHTML, /Educadora 1/);
   assert.equal(educadorSelect.value, 'Todos');
+});
+
+test('populateFilters restricts profile options using the current analytical cut', () => {
+  setupDocument();
+  const model = {
+    students: [
+      {
+        turma: 'Turma A',
+        municipio: 'Maceió',
+        educador: 'Educadora 1',
+        situacao: CERTIFICATION_STATUS.acompanhamento,
+        statusInscricao: 'INSCRITO',
+        perfil: {
+          genero: 'Mulher cisgênero',
+          racaEtnia: 'Parda',
+          vinculoProfissional: 'Contrato'
+        }
+      },
+      {
+        turma: 'Turma B',
+        municipio: 'Penedo',
+        educador: 'Educadora 2',
+        situacao: CERTIFICATION_STATUS.acompanhamento,
+        statusInscricao: 'INSCRITO',
+        perfil: {
+          genero: 'Homem cisgênero',
+          racaEtnia: 'Branca',
+          vinculoProfissional: 'Estatutário'
+        }
+      }
+    ],
+    options: {}
+  };
+
+  populateFilters(model, {
+    educador: 'Educadora 1',
+    turma: 'Todos'
+  });
+
+  assert.match(document.getElementById('filterGenero').innerHTML, /Mulher cisgênero/);
+  assert.doesNotMatch(document.getElementById('filterGenero').innerHTML, /Homem cisgênero/);
+  assert.match(document.getElementById('filterRacaEtnia').innerHTML, /Parda/);
+  assert.doesNotMatch(document.getElementById('filterRacaEtnia').innerHTML, /Branca/);
+  assert.match(document.getElementById('filterVinculoProfissional').innerHTML, /Contrato/);
+  assert.doesNotMatch(document.getElementById('filterVinculoProfissional').innerHTML, /Estatutário/);
 });
 
 test('render helpers escape text and render empty states', () => {
@@ -314,7 +388,7 @@ test('renderReportSummary explains the current filtered cut', () => {
   assert.match(html, /2 não aptos/);
 });
 
-test('renderProfileAnalytics renders aggregate-only cards and rows', () => {
+test('renderProfileAnalytics renders compact aggregate cards without a table', () => {
   setupDocument();
 
   renderProfileAnalytics({
@@ -329,25 +403,12 @@ test('renderProfileAnalytics renders aggregate-only cards and rows', () => {
       profileOnly: 4,
       percentMatched: 80
     },
-    rows: [{
-      dimension: 'Raça/etnia',
-      group: 'Parda',
-      total: 8,
-      frequenciaMedia: 70,
-      faltasMedia: 3.2,
-      aptosCertificacao: 6,
-      percentualAptosCertificacao: 75,
-      criticos: 2,
-      percentualCriticos: 25,
-      naoAptos: 1,
-      percentualNaoAptos: 12.5
-    }]
+    rows: []
   });
 
   assert.match(document.getElementById('profileSummary').innerHTML, /Perfis vinculados/);
   assert.match(document.getElementById('profileSummary').innerHTML, /80%/);
-  assert.match(document.getElementById('profileTable').innerHTML, /Raça\/etnia/);
-  assert.match(document.getElementById('profileTable').innerHTML, /Parda/);
+  assert.match(document.getElementById('profileSummary').innerHTML, /Grupos protegidos/);
   assert.match(document.getElementById('profileStatus').textContent, /menos de 5/);
 });
 
@@ -363,7 +424,6 @@ test('renderProfileAnalytics keeps dashboard usable when complementary data fail
 
   assert.match(document.getElementById('profileStatus').textContent, /indisponíveis/);
   assert.equal(document.getElementById('profileStatus').classList.contains('is-error'), true);
-  assert.match(document.getElementById('profileTable').innerHTML, /planilha complementar/);
 });
 
 test('renderLoadState updates status classes and last updated timestamp', () => {

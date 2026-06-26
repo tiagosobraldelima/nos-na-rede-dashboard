@@ -1,7 +1,7 @@
 import { REFRESH_INTERVAL_MS } from './config.js';
 import { fetchProfileRows, fetchSheetRows } from './csv.js';
 import { applyFilters, buildAttendanceModel } from './attendanceModel.js';
-import { buildProfileAnalytics } from './profileModel.js';
+import { buildProfileAnalytics, enrichAttendanceModelWithProfiles } from './profileModel.js';
 import { renderCharts } from './charts.js';
 import { bindReportDownloads } from './reports.js';
 import {
@@ -34,8 +34,8 @@ export function render() {
   renderKpis(filteredModel.summary);
   renderReportSummary(filteredModel.summary);
   renderProfileAnalytics(buildProfileAnalytics(filteredModel.students, profileRows), profileLoadIssue);
-  renderRiskList(filteredModel.students);
-  renderStudentTable(filteredModel.students);
+  renderRiskList(filteredModel.students, undefined, filteredModel.privacyBlocked, filteredModel.privacyMessage);
+  renderStudentTable(filteredModel.students, undefined, filteredModel.privacyBlocked, filteredModel.privacyMessage);
 
   try {
     renderCharts(filteredModel);
@@ -69,7 +69,7 @@ export async function loadData() {
     }
 
     const rows = attendanceResult.value;
-    baseModel = buildAttendanceModel(rows);
+    baseModel = enrichAttendanceModelWithProfiles(buildAttendanceModel(rows), profileRows);
     populateFilters(baseModel, readFilters());
     render();
     renderLoadState({

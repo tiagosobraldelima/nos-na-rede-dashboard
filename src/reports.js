@@ -58,6 +58,9 @@ function buildFilterDescription(filters = {}) {
     ['Turma', filters.turma],
     ['Município', filters.municipio],
     ['Educador(a)', filters.educador],
+    ['Identidade de gênero', filters.genero],
+    ['Raça/etnia', filters.racaEtnia],
+    ['Vínculo profissional', filters.vinculoProfissional],
     ['Encontro', filters.encontro],
     ['Situação', filters.situacao],
     ['Status de inscrição', filters.statusInscricao],
@@ -534,10 +537,13 @@ export function downloadTableXlsx(model, filters) {
 }
 
 export function resolveDownloadModel(context = {}, scope = 'filtered') {
+  const profileFilterActive = ['genero', 'racaEtnia', 'vinculoProfissional']
+    .some((key) => context.filters?.[key] && context.filters[key] !== 'Todos');
   if (
     scope === 'table'
     && context.tablePageSize === 'all'
     && context.fullModel
+    && !profileFilterActive
   ) {
     return context.fullModel;
   }
@@ -558,6 +564,14 @@ async function runDownload(getContext, downloadFn, label, statusTargetId, scope)
   const { filters } = context;
   if (!model) {
     setStatus(statusTargetId, 'Aguarde o carregamento dos dados antes de baixar o relatório.', true);
+    return;
+  }
+  if (model.privacyBlocked) {
+    setStatus(
+      statusTargetId,
+      model.privacyMessage || 'Relatório individual bloqueado por proteção de privacidade. Ajuste os filtros.',
+      true
+    );
     return;
   }
 

@@ -82,6 +82,24 @@
                         <option value="">Todos os educadores</option>
                     </select>
                 </label>
+                <label for="filterGenero">
+                    Identidade de gênero
+                    <select id="filterGenero">
+                        <option value="">Todas as identidades</option>
+                    </select>
+                </label>
+                <label for="filterRacaEtnia">
+                    Raça/etnia
+                    <select id="filterRacaEtnia">
+                        <option value="">Todas as raças/etnias</option>
+                    </select>
+                </label>
+                <label for="filterVinculoProfissional">
+                    Vínculo profissional
+                    <select id="filterVinculoProfissional">
+                        <option value="">Todos os vínculos</option>
+                    </select>
+                </label>
                 <label for="filterSituacao">
                     Situação
                     <select id="filterSituacao">
@@ -152,27 +170,6 @@
                 <p class="empty-state">A análise de perfil será gerada após o carregamento dos dados.</p>
             </div>
             <p id="profileStatus" class="download-status" aria-live="polite"></p>
-            <div class="table-wrap profile-table-wrap">
-                <table class="data-table profile-table">
-                    <thead>
-                        <tr>
-                            <th>Recorte <i class="fa-solid fa-sort"></i></th>
-                            <th>Grupo <i class="fa-solid fa-sort"></i></th>
-                            <th>Cursistas <i class="fa-solid fa-sort"></i></th>
-                            <th>Freq. média <i class="fa-solid fa-sort"></i></th>
-                            <th>Faltas méd. <i class="fa-solid fa-sort"></i></th>
-                            <th>Aptos 0–3 faltas <i class="fa-solid fa-sort"></i></th>
-                            <th>Críticos 2–3 faltas <i class="fa-solid fa-sort"></i></th>
-                            <th>Sem possibilidade <i class="fa-solid fa-sort"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="profileTable">
-                        <tr>
-                            <td colspan="8">Os recortes agregados serão exibidos aqui.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </section>
 
         <section class="panel risk-panel" aria-labelledby="riskTitle">

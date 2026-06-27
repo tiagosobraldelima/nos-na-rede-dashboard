@@ -112,6 +112,44 @@ test('creates automatic dispensa for cursista without first encounter launch', (
   assert.equal(bruno.situacao, CERTIFICATION_STATUS.acompanhamento);
 });
 
+test('automatic dispensa is restricted to the first encounter (encounters 2-N stay as semRegistro)', () => {
+  const rows = [
+    {
+      ord: '1',
+      nome: 'CARLA SOUZA',
+      cpf: '333',
+      n_inscricao: 'C1',
+      status_da_inscricao: 'INSCRITO',
+      municipio: 'ARACAJU',
+      turma: 'SE-ARACAJU',
+      email: 'carla@example.com',
+      educador_a: 'PEDRO',
+      n_encontro: '1º',
+      data_do_encontro: '2026-05-01',
+      turno_1: 'PRESENTE',
+      turno_2: 'PRESENTE',
+      observacoes: ''
+    }
+  ];
+  const model = buildAttendanceModel(rows);
+  const carla = model.students[0];
+
+  // Encontro 1 com registro: presenças válidas, zero dispensa automática.
+  // Encontros 2-5 sem registro: 4 encontros × 2 períodos = 8 semRegistro.
+  assert.equal(carla.dispensasAutomaticas, 0);
+  assert.equal(carla.presencas, 2);
+  assert.equal(carla.semRegistro, 8);
+  assert.equal(carla.periodosValidos, 2);
+  assert.equal(carla.percentualFrequencia, 20);
+
+  const byEncontro = model.breakdowns.byEncounter;
+  // Encontros 2-N sem registro: vão como 'semRegistro', não viram dispensa automática.
+  for (let i = 1; i < byEncontro.length; i += 1) {
+    assert.equal(byEncontro[i].dispensas, 0, `encontro ${i + 1} não pode ter dispensa automática`);
+    assert.equal(byEncontro[i].semRegistro, 2, `encontro ${i + 1} deve manter os 2 períodos como semRegistro`);
+  }
+});
+
 test('marks student as apt when valid periods reach seven', () => {
   const rows = [
     ...baseRows,

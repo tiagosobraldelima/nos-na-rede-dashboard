@@ -31,6 +31,8 @@ function classifyPeriod(rawStatus, encounter, hasRow) {
   if (value === 'AUSENTE') return 'ausente';
   if (value === 'DISPENSADO') return 'dispensado';
   if (value === 'ATESTADO MEDICO') return 'atestado';
+  // Regra de dispensa automática: aplica-se EXCLUSIVAMENTE ao 1º encontro.
+  // Encontros 2-N sem registro viram 'semRegistro' e não contam como dispensa.
   if (encounter === 1 && (!hasRow || value === '')) return 'dispensaAutomatica';
   return 'semRegistro';
 }

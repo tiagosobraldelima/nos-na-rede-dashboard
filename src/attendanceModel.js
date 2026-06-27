@@ -2,7 +2,6 @@ import {
   CERTIFICATION_STATUS,
   MIN_VALID_PERIODS,
   PERIODS_PER_ENCOUNTER,
-  PROFILE_PRIVACY_MIN_GROUP,
   TOTAL_ENCOUNTERS,
   TOTAL_PERIODS
 } from './config.js';
@@ -335,18 +334,11 @@ export function applyFilters(model, filters) {
       && (!filters.situacao || filters.situacao === 'Todos' || student.situacao === filters.situacao)
       && (!filters.statusInscricao || filters.statusInscricao === 'Todos' || student.statusInscricao === filters.statusInscricao);
   });
-  const profileFilterActive = ['genero', 'racaEtnia', 'vinculoProfissional']
-    .some((key) => filters[key] && filters[key] !== 'Todos');
-  const privacyBlocked = profileFilterActive && students.length > 0 && students.length < PROFILE_PRIVACY_MIN_GROUP;
 
   return {
     ...model,
     students,
     summary: buildSummary(students),
-    breakdowns: buildBreakdowns(students),
-    privacyBlocked,
-    privacyMessage: privacyBlocked
-      ? `Recorte protegido: os filtros de perfil retornaram menos de ${PROFILE_PRIVACY_MIN_GROUP} cursistas. Ajuste os filtros para visualizar listas e relatórios individuais.`
-      : ''
+    breakdowns: buildBreakdowns(students)
   };
 }

@@ -1,4 +1,4 @@
-import { PROFILE_PRIVACY_MIN_GROUP, REFRESH_INTERVAL_MS } from './config.js';
+import { REFRESH_INTERVAL_MS } from './config.js';
 import { fetchProfileRows, fetchSheetRows } from './csv.js';
 import { applyFilters, buildAttendanceModel } from './attendanceModel.js';
 import { buildProfileAnalytics, enrichAttendanceModelWithProfiles } from './profileModel.js';
@@ -29,7 +29,6 @@ let refreshTimerId = null;
 function emptyProfileAnalytics(totalAttendance = 0) {
   return {
     available: false,
-    minGroupSize: PROFILE_PRIVACY_MIN_GROUP,
     coverage: {
       totalAttendance,
       totalProfiles: 0,
@@ -64,8 +63,8 @@ export function render() {
   renderKpis(filteredModel.summary);
   renderReportSummary(filteredModel.summary);
   renderProfileAnalytics(profileAnalytics, profileLoadIssue);
-  renderRiskList(filteredModel.students, undefined, filteredModel.privacyBlocked, filteredModel.privacyMessage);
-  renderStudentTable(filteredModel.students, undefined, filteredModel.privacyBlocked, filteredModel.privacyMessage);
+  renderRiskList(filteredModel.students);
+  renderStudentTable(filteredModel.students);
 
   try {
     renderCharts(filteredModel);

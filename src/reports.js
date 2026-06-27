@@ -566,14 +566,6 @@ async function runDownload(getContext, downloadFn, label, statusTargetId, scope)
     setStatus(statusTargetId, 'Aguarde o carregamento dos dados antes de baixar o relatório.', true);
     return;
   }
-  if (model.privacyBlocked) {
-    setStatus(
-      statusTargetId,
-      model.privacyMessage || 'Relatório individual bloqueado por proteção de privacidade. Ajuste os filtros.',
-      true
-    );
-    return;
-  }
 
   try {
     const fullBaseMessage = scope === 'table' && context.tablePageSize === 'all'

@@ -298,16 +298,9 @@ export function readRiskPageSize() {
   return readPageSize(RISK_PAGE_SIZE_ID);
 }
 
-export function renderRiskList(students = [], pageSize = readRiskPageSize(), privacyBlocked = false, privacyMessage = '') {
+export function renderRiskList(students = [], pageSize = readRiskPageSize()) {
   const target = element('riskList');
   if (!target) return;
-
-  if (privacyBlocked) {
-    target.innerHTML = `<tr><td colspan="7">${escapeHtml(privacyMessage)}</td></tr>`;
-    const riskStatus = element('riskDisplayStatus');
-    if (riskStatus) riskStatus.textContent = 'Visualização individual protegida por privacidade.';
-    return;
-  }
 
   const riskStudents = students
     .filter((student) => (
@@ -355,16 +348,9 @@ export function readTablePageSize() {
   return readPageSize(TABLE_PAGE_SIZE_ID);
 }
 
-export function renderStudentTable(students = [], pageSize = readTablePageSize(), privacyBlocked = false, privacyMessage = '') {
+export function renderStudentTable(students = [], pageSize = readTablePageSize()) {
   const target = element('studentTable');
   if (!target) return;
-
-  if (privacyBlocked) {
-    target.innerHTML = `<tr><td colspan="10">${escapeHtml(privacyMessage)}</td></tr>`;
-    const tableStatus = element('tableDisplayStatus');
-    if (tableStatus) tableStatus.textContent = 'Visualização individual protegida por privacidade.';
-    return;
-  }
 
   if (students.length === 0) {
     target.innerHTML = '<tr><td colspan="10">Nenhum participante encontrado para os filtros atuais.</td></tr>';

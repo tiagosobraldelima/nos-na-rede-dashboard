@@ -268,7 +268,7 @@ test('aggregates summary and filters by turma, municipio, educator, situation an
   assert.equal(filtered.summary.periodosPrevistosTotal, 10);
 });
 
-test('filters by complementary profile fields and protects small sensitive cuts', () => {
+test('filters by complementary profile fields without blocking small sensitive cuts', () => {
   const model = buildAttendanceModel(baseRows);
   const students = model.students.map((student) => ({
     ...student,
@@ -299,8 +299,8 @@ test('filters by complementary profile fields and protects small sensitive cuts'
 
   assert.deepEqual(filtered.students.map((student) => student.nome), ['Ana Maria']);
   assert.equal(filtered.summary.totalCursistas, 1);
-  assert.equal(filtered.privacyBlocked, true);
-  assert.match(filtered.privacyMessage, /menos de 5/);
+  assert.equal(filtered.privacyBlocked, undefined);
+  assert.equal(filtered.privacyMessage, undefined);
 });
 
 test('aggregates breakdown by certification situation', () => {
